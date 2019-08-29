@@ -16,6 +16,10 @@
 
 package com.haulmont.cuba.core.sys.connectionpool;
 
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.CommonsConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.ConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.HikariConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.TomcatConnectionPoolInfo;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Component;
@@ -29,7 +33,9 @@ public class ConnectionPoolSpecificFactory {
 
     private static Map<String, Class<? extends ConnectionPoolInfo>> registeredPools = new HashMap<>();
     private static Map<String, ConnectionPoolInfo> registeredPoolsCache = new HashMap<>();
-    protected static final ConnectionPoolInfo emptyPoolInfo = new ConnectionPoolInfo(){};;
+    protected static final ConnectionPoolInfo emptyPoolInfo = new ConnectionPoolInfo() {
+    };
+    ;
     protected static volatile boolean dbConnPoolNotFound;
 
     static {
@@ -55,7 +61,7 @@ public class ConnectionPoolSpecificFactory {
             return emptyPoolInfo;
         }
 
-        if (registeredPoolsCache.containsKey(poolName)){
+        if (registeredPoolsCache.containsKey(poolName)) {
             return registeredPoolsCache.get(poolName);
         }
 
@@ -66,15 +72,16 @@ public class ConnectionPoolSpecificFactory {
         }
 
         ConnectionPoolInfo connectionPoolInfo;
+
         try {
             connectionPoolInfo = registeredPools.get(poolName).newInstance();
-        } catch (Exception e) {
+        } catch (InstantiationException | IllegalAccessException e) {
             log.warn(String.format("Can't instantiate new instance of %s", poolName), e);
             dbConnPoolNotFound = true;
             return emptyPoolInfo;
         }
 
-        if (connectionPoolInfo.getRegisteredMBeanName() == null){
+        if (connectionPoolInfo.getRegisteredMBeanName() == null) {
             log.warn(String.format("No one connection pool was found for %s type!", poolName));
             dbConnPoolNotFound = true;
             return emptyPoolInfo;

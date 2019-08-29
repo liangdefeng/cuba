@@ -19,7 +19,7 @@ package com.haulmont.cuba.core.jmx;
 
 import com.haulmont.cuba.core.app.MiddlewareStatisticsAccumulator;
 import com.haulmont.cuba.core.global.GlobalConfig;
-import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.ConnectionPoolInfo;
 import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolSpecificFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

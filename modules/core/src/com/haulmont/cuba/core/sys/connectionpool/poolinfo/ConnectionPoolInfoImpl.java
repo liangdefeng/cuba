@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool;
+package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
 
 import com.haulmont.cuba.core.global.GlobalConfig;
+import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolUtils;
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;

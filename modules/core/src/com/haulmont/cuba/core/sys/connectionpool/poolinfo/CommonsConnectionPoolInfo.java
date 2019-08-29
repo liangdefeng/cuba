@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool;
+package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
+
+import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolUtils;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;

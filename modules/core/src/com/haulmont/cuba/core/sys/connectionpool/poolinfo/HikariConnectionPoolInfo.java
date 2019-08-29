@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool;
-
-import org.springframework.stereotype.Component;
+package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
 
 import javax.management.*;
 import java.lang.management.ManagementFactory;

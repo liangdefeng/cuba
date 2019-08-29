@@ -39,7 +39,7 @@ public class ConnectionPoolUtils {
         return null;
     }
 
-    protected static String getMainDatasourceName() {
+    public static String getMainDatasourceName() {
         String name = "CubaDS";
         String jndiName = AppContext.getProperty("cuba.dataSourceJndiName");
         if (jndiName != null) {
