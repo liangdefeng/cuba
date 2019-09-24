@@ -17,8 +17,8 @@
 package com.haulmont.cuba.entity_cache;
 
 import com.haulmont.cuba.testsupport.TestContainer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -32,11 +32,11 @@ public class EntityCacheTestSuite {
             .setAppPropertiesFiles(Arrays.asList("com/haulmont/cuba/app.properties", "com/haulmont/cuba/testsupport/test-app.properties", "com/haulmont/cuba/test-app.properties",
                     "com/haulmont/cuba/entity_cache/test-entitycache-app.properties"));
 
-    @BeforeClass
+    @BeforeAll
     public static void setUp() throws Exception {
     }
 
-    @AfterClass
+    @AfterAll
     public static void tearDown() throws Exception {
     }
 }
