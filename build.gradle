@@ -725,6 +725,7 @@ configure(webModule) {
     }
 
     task testUiComponents(type: Test) {
+        useJUnitPlatform()
         maxHeapSize = '256m'
 
         if (System.getProperty('logback.configurationFile')) {
