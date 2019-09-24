@@ -57,7 +57,9 @@ import static org.junit.Assert.*;
 public class QueryCacheTestClass {
 
     @RegisterExtension
-    public static TestContainer cont = EntityCacheTestSuite.cont;
+    public static TestContainer cont = new TestContainer()
+            .setAppPropertiesFiles(Arrays.asList("com/haulmont/cuba/app.properties", "com/haulmont/cuba/testsupport/test-app.properties", "com/haulmont/cuba/test-app.properties",
+                    "com/haulmont/cuba/entity_cache/test-entitycache-app.properties"));
 
     @RegisterExtension
     public TestRule testNamePrinter = new TestNamePrinter();

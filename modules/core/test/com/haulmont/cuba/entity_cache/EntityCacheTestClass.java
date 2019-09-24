@@ -44,8 +44,8 @@ import org.junit.rules.TestRule;
 import org.slf4j.LoggerFactory;
 
 import javax.persistence.EntityManagerFactory;
+import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.function.Predicate;
 
 import static com.haulmont.cuba.testsupport.TestSupport.assertFail;
@@ -59,7 +59,9 @@ import static org.junit.Assert.*;
 public class EntityCacheTestClass {
 
     @RegisterExtension
-    public static TestContainer cont = EntityCacheTestSuite.cont;
+    public static TestContainer cont = new TestContainer()
+            .setAppPropertiesFiles(Arrays.asList("com/haulmont/cuba/app.properties", "com/haulmont/cuba/testsupport/test-app.properties", "com/haulmont/cuba/test-app.properties",
+                    "com/haulmont/cuba/entity_cache/test-entitycache-app.properties"));
 
     @RegisterExtension
     public TestRule testNamePrinter = new TestNamePrinter();
