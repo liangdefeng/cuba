@@ -27,10 +27,11 @@ import org.springframework.lang.NonNull;
 
 import javax.naming.NamingException;
 import javax.sql.DataSource;
-import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.*;
 
 public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
+
     protected static final String DATASOURCE_PROVIDER_PROPERTY_NAME = "cuba.dataSourceProvider";
     protected static final String HOST = "hostname";
     protected static final String PORT = "port";
@@ -43,7 +44,7 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
     protected static final String ORACLE_DBMS = "oracle";
     protected static final String MYSQL_DBMS = "mysql";
     protected static final String HSQL_DBMS = "hsql";
-    protected static final ImmutableList<String> cubaDSDefaultParams = ImmutableList.of(HOST, PORT, DB_NAME, CONNECTION_PARAMS);
+    protected static final ImmutableList<String> cubaDsDefaultParams = ImmutableList.of(HOST, PORT, DB_NAME, CONNECTION_PARAMS);
 
     protected String dataSourceProvider;
 
@@ -74,7 +75,7 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
     }
 
     protected String getDataSourceProvider() {
-        return AppContext.getProperty(getDSProviderPropertyName());
+        return AppContext.getProperty(getDsProviderPropertyName());
     }
 
     protected DataSource getApplicationDataSource() {
@@ -92,22 +93,22 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
     }
 
     protected Properties getHikariConfigProperties() {
-        String cubaConfigDSPrefix = "cuba.dataSource.";
+        String cubaConfigDsPrefix = "cuba.dataSource.";
         if (!Stores.isMain(storeName)) {
-            cubaConfigDSPrefix = "cuba.dataSource_" + storeName + ".";
+            cubaConfigDsPrefix = "cuba.dataSource_" + storeName + ".";
         }
 
-        Map<String, String> cubaDSProperties = getAllDSProperties(cubaConfigDSPrefix);
-        Properties hikariConfigProperties = getHikariConfigProperties(cubaDSProperties);
+        Map<String, String> cubaDsProperties = getAllDsProperties(cubaConfigDsPrefix);
+        Properties hikariConfigProperties = getHikariConfigProperties(cubaDsProperties);
 
         if (hikariConfigProperties.getProperty(JDBC_URL) == null) {
-            hikariConfigProperties.setProperty(JDBC_URL, getJdbcUrlFromParts(cubaConfigDSPrefix));
+            hikariConfigProperties.setProperty(JDBC_URL, getJdbcUrlFromParts(cubaConfigDsPrefix));
         }
         return hikariConfigProperties;
     }
 
-    protected Map<String, String> getAllDSProperties(String dsPrefix) {
-        Map<String, String> allDSProperties = new HashMap<>();
+    protected Map<String, String> getAllDsProperties(String dsPrefix) {
+        Map<String, String> allDsProperties = new HashMap<>();
         String[] propertiesNames = AppContext.getPropertyNames();
         for (String cubaPropertyName : propertiesNames) {
             if (!cubaPropertyName.startsWith(dsPrefix)) {
@@ -117,22 +118,22 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
             if (value == null) {
                 continue;
             }
-            allDSProperties.put(cubaPropertyName.replace(dsPrefix, ""), value);
+            allDsProperties.put(cubaPropertyName.replace(dsPrefix, ""), value);
         }
-        return allDSProperties;
+        return allDsProperties;
     }
 
     protected Properties getHikariConfigProperties(Map<String, String> properties) {
         Properties hikariConfigProperties = new Properties();
         for (Map.Entry<String, String> property : properties.entrySet()) {
-            if (cubaDSDefaultParams.contains(property.getKey())) {
+            if (cubaDsDefaultParams.contains(property.getKey())) {
                 continue;
             }
-            String hikariConfigDSPrefix = "dataSource.";
+            String hikariConfigDsPrefix = "dataSource.";
             if (isHikariConfigField(property.getKey())) {
-                hikariConfigDSPrefix = "";
+                hikariConfigDsPrefix = "";
             }
-            hikariConfigProperties.put(hikariConfigDSPrefix.concat(property.getKey()), property.getValue());
+            hikariConfigProperties.put(hikariConfigDsPrefix.concat(property.getKey()), property.getValue());
         }
         return hikariConfigProperties;
     }
@@ -188,9 +189,10 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
     }
 
     protected boolean isHikariConfigField(String propertyName) {
-        Field[] fields = HikariConfig.class.getDeclaredFields();
-        for (Field field : fields) {
-            if (propertyName.equals(field.getName())) {
+        Method[] methods = HikariConfig.class.getMethods();
+        String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+        for (Method method : methods) {
+            if (setterName.equals(method.getName())) {
                 return true;
             }
         }
@@ -210,7 +212,7 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
         return object;
     }
 
-    protected String getDSProviderPropertyName() {
+    protected String getDsProviderPropertyName() {
         if (storeName != null) {
             return DATASOURCE_PROVIDER_PROPERTY_NAME + "_" + storeName;
         }
