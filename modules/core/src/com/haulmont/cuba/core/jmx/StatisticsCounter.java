@@ -109,22 +109,19 @@ public class StatisticsCounter implements StatisticsCounterMBean {
     @Override
     public int getDbConnectionPoolNumActive() {
         connectionPoolInfo = getConnectionPoolInfo();
-        return connectionPoolInfo == null ?
-                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getActiveConnectionsAttrName());
+        return connectionPoolInfo == null ? 0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getActiveConnectionsAttrName());
     }
 
     @Override
     public int getDbConnectionPoolNumIdle() {
         connectionPoolInfo = getConnectionPoolInfo();
-        return connectionPoolInfo == null ?
-                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getIdleConnectionsAttrName());
+        return connectionPoolInfo == null ? 0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getIdleConnectionsAttrName());
     }
 
     @Override
     public int getDbConnectionPoolMaxTotal() {
         connectionPoolInfo = getConnectionPoolInfo();
-        return connectionPoolInfo == null ?
-                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getTotalConnectionsAttrName());
+        return connectionPoolInfo == null ? 0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getTotalConnectionsAttrName());
     }
 
     protected ConnectionPoolInfo getConnectionPoolInfo() {
@@ -146,7 +143,8 @@ public class StatisticsCounter implements StatisticsCounterMBean {
         return connectionPoolInfo;
     }
 
-    private int getDbConnectionPoolMBeanAttr(ObjectName registeredMbeanPoolName, String attrName) {
+    private int getDbConnectionPoolMBeanAttr(String attrName) {
+        ObjectName registeredMbeanPoolName = connectionPoolInfo.getRegisteredMBeanName();
         try {
             return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredMbeanPoolName, attrName);
         } catch (JMException e) {
