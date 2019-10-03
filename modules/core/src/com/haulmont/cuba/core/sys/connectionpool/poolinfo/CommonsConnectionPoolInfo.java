@@ -17,12 +17,10 @@
 package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
 
 import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolUtils;
-
-import javax.management.*;
-import java.lang.management.ManagementFactory;
 import java.util.regex.Pattern;
 
 public class CommonsConnectionPoolInfo extends ConnectionPoolInfoImpl {
+
     @Override
     public String getPoolName() {
         return "Commons Connection Pool";
@@ -31,7 +29,7 @@ public class CommonsConnectionPoolInfo extends ConnectionPoolInfoImpl {
     @Override
     public Pattern getRegexPattern() {
         String usualDsRegexp = String.format(
-                "Catalina:type=DataSource,host=[\\w\\d]+,context=/%s,class=javax.sql.DataSource,name=\"%s\"",
+                "Catalina:type=DataSource,host=[\\w\\d]+,context=/%s,class=javax.sql.DataSource,name=\".*%s\"",
                 globalConfig.getWebContextName(),
                 ConnectionPoolUtils.getMainDatasourceName()
         );
@@ -39,17 +37,17 @@ public class CommonsConnectionPoolInfo extends ConnectionPoolInfoImpl {
     }
 
     @Override
-    public int getActiveConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "numActive");
+    public String getActiveConnectionsAttrName() {
+        return "numActive";
     }
 
     @Override
-    public int getIdleConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "numIdle");
+    public String getIdleConnectionsAttrName() {
+        return "numIdle";
     }
 
     @Override
-    public int getTotalConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "maxTotal");
+    public String getTotalConnectionsAttrName() {
+        return "maxTotal";
     }
 }

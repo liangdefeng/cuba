@@ -16,7 +16,6 @@
 
 package com.haulmont.cuba.core.sys.connectionpool;
 
-import com.google.common.base.Preconditions;
 import com.haulmont.cuba.core.sys.AppContext;
 
 import javax.management.ObjectName;
@@ -26,7 +25,7 @@ import java.util.regex.Pattern;
 
 public class ConnectionPoolUtils {
     public static ObjectName getPoolObjectName(Pattern regexPattern) {
-        if(regexPattern == null) {
+        if (regexPattern == null) {
             return null;
         }
 

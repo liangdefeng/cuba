@@ -266,11 +266,4 @@ public interface GlobalConfig extends Config {
     @Property("cuba.rememberMeExpirationTimeoutSec")
     @DefaultInt(30 * 24 * 60 * 60)
     int getRememberMeExpirationTimeoutSec();
-
-    /**
-     * @return current connection pool name
-     */
-    @Property("cuba.connectionPoolName")
-    @DefaultString("COMMONS")
-    String getConnectionPoolName();
 }

@@ -20,46 +20,33 @@ import javax.management.*;
 import java.util.regex.Pattern;
 
 public interface ConnectionPoolInfo {
-
     /**
      * @return connection pool name
      */
-    default String getPoolName() {
-        return "Empty Connection Pool";
-    }
+    String getPoolName();
 
     /**
      * @return registered bean name for connection pool
      */
-    default ObjectName getRegisteredMBeanName() {
-        return null;
-    }
+    ObjectName getRegisteredMBeanName();
 
     /**
      * @return return regex pattern to find connection pool ObjectName
      */
-    default Pattern getRegexPattern() {
-        return null;
-    }
+    Pattern getRegexPattern();
 
     /**
-     * @return current count of active connections
+     * @return name of active connections attribute
      */
-    default int getActiveConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return 0;
-    }
+    String getActiveConnectionsAttrName();
 
     /**
-     * @return current count of idle connections
+     * @return name of idle connections attribute
      */
-    default int getIdleConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return 0;
-    }
+    String getIdleConnectionsAttrName();
 
     /**
-     * @return count of total available connections (active and idle)
+     * @return name of total available connections (active and idle) attribute
      */
-    default int getTotalConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return 0;
-    }
+    String getTotalConnectionsAttrName();
 }

@@ -16,8 +16,7 @@
 
 package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
 
-import javax.management.*;
-import java.lang.management.ManagementFactory;
+import com.haulmont.cuba.core.global.Stores;
 import java.util.regex.Pattern;
 
 public class HikariConnectionPoolInfo extends ConnectionPoolInfoImpl {
@@ -28,21 +27,21 @@ public class HikariConnectionPoolInfo extends ConnectionPoolInfoImpl {
 
     @Override
     public Pattern getRegexPattern() {
-        return Pattern.compile("^com\\.zaxxer\\.hikari:type=Pool \\(.*\\)$");
+        return Pattern.compile("^com\\.zaxxer\\.hikari:type=Pool \\(.*" + Stores.MAIN + "\\)$");
     }
 
     @Override
-    public int getActiveConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return  (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "ActiveConnections");
+    public String getActiveConnectionsAttrName() {
+        return "ActiveConnections";
     }
 
     @Override
-    public int getIdleConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "IdleConnections");
+    public String getIdleConnectionsAttrName() {
+        return "IdleConnections";
     }
 
     @Override
-    public int getTotalConnectionsCount() throws AttributeNotFoundException, MBeanException, ReflectionException, InstanceNotFoundException {
-        return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredPoolName, "TotalConnections");
+    public String getTotalConnectionsAttrName() {
+        return "TotalConnections";
     }
 }

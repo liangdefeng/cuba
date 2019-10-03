@@ -19,19 +19,24 @@ package com.haulmont.cuba.core.jmx;
 
 import com.haulmont.cuba.core.app.MiddlewareStatisticsAccumulator;
 import com.haulmont.cuba.core.global.GlobalConfig;
+import com.haulmont.cuba.core.sys.AppContext;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.CommonsConnectionPoolInfo;
 import com.haulmont.cuba.core.sys.connectionpool.poolinfo.ConnectionPoolInfo;
-import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolSpecificFactory;
+import com.haulmont.cuba.core.sys.connectionpool.poolinfo.HikariConnectionPoolInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Component;
 
 import javax.inject.Inject;
+import javax.management.*;
+import java.lang.management.ManagementFactory;
 
 @Component("cuba_StatisticsCounterMBean")
 public class StatisticsCounter implements StatisticsCounterMBean {
 
     private static final Logger log = LoggerFactory.getLogger(StatisticsCounter.class);
+    protected volatile boolean dbConnPoolNotFound;
 
     @Inject
     protected MiddlewareStatisticsAccumulator accumulator;
@@ -39,7 +44,7 @@ public class StatisticsCounter implements StatisticsCounterMBean {
     @Inject
     protected GlobalConfig globalConfig;
 
-    private volatile ConnectionPoolInfo connectionPoolInfo;
+    protected volatile ConnectionPoolInfo connectionPoolInfo;
 
     @Override
     public Long getActiveTransactionsCount() {
@@ -104,38 +109,50 @@ public class StatisticsCounter implements StatisticsCounterMBean {
     @Override
     public int getDbConnectionPoolNumActive() {
         connectionPoolInfo = getConnectionPoolInfo();
-        try {
-            return connectionPoolInfo.getActiveConnectionsCount();
-        } catch (Exception e) {
-            log.warn(String.format("Can't get number of active connections from the %s!", connectionPoolInfo.getPoolName()));
-        }
-        return 0;
+        return connectionPoolInfo == null ?
+                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getActiveConnectionsAttrName());
     }
 
     @Override
     public int getDbConnectionPoolNumIdle() {
         connectionPoolInfo = getConnectionPoolInfo();
-        try {
-            return connectionPoolInfo.getIdleConnectionsCount();
-        } catch (Exception e) {
-            log.warn(String.format("Can't get number of idle connections from the %s!", connectionPoolInfo.getPoolName()));
-        }
-        return 0;
+        return connectionPoolInfo == null ?
+                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getIdleConnectionsAttrName());
     }
 
     @Override
     public int getDbConnectionPoolMaxTotal() {
         connectionPoolInfo = getConnectionPoolInfo();
-        try {
-            return connectionPoolInfo.getTotalConnectionsCount();
-        } catch (Exception e) {
-            log.warn(String.format("Can't get number of total connections from the %s!", connectionPoolInfo.getPoolName()));
-        }
-        return 0;
+        return connectionPoolInfo == null ?
+                0 : getDbConnectionPoolMBeanAttr(connectionPoolInfo.getRegisteredMBeanName(), connectionPoolInfo.getTotalConnectionsAttrName());
     }
 
     protected ConnectionPoolInfo getConnectionPoolInfo() {
-        return ConnectionPoolSpecificFactory.getConnectionPoolInfo(globalConfig.getConnectionPoolName());
+        if (dbConnPoolNotFound) {
+            return null;
+        }
+
+        String dsProvider = AppContext.getProperty("cuba.dataSourceProvider");
+        ConnectionPoolInfo connectionPoolInfo = new HikariConnectionPoolInfo();
+        if ("jndi".equals(dsProvider)) {
+            connectionPoolInfo = new CommonsConnectionPoolInfo();
+        }
+
+        if (connectionPoolInfo.getRegisteredMBeanName() == null) {
+            log.warn("No one connection pool was found for statistics counting!");
+            dbConnPoolNotFound = true;
+            return null;
+        }
+        return connectionPoolInfo;
+    }
+
+    private int getDbConnectionPoolMBeanAttr(ObjectName registeredMbeanPoolName, String attrName) {
+        try {
+            return (Integer) ManagementFactory.getPlatformMBeanServer().getAttribute(registeredMbeanPoolName, attrName);
+        } catch (JMException e) {
+            log.warn(String.format("Can't get MBean attribute %s from %s pool!", attrName, registeredMbeanPoolName.getCanonicalName()), e);
+        }
+        return 0;
     }
 
     @Override
