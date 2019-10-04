@@ -20,9 +20,9 @@ package com.haulmont.cuba.core.jmx;
 import com.haulmont.cuba.core.app.MiddlewareStatisticsAccumulator;
 import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.core.sys.AppContext;
-import com.haulmont.cuba.core.sys.connectionpool.poolinfo.CommonsConnectionPoolInfo;
-import com.haulmont.cuba.core.sys.connectionpool.poolinfo.ConnectionPoolInfo;
-import com.haulmont.cuba.core.sys.connectionpool.poolinfo.HikariConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpoolinfo.CommonsConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpoolinfo.ConnectionPoolInfo;
+import com.haulmont.cuba.core.sys.connectionpoolinfo.HikariConnectionPoolInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

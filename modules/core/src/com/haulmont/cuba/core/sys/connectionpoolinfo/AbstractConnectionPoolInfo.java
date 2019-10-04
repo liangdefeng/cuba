@@ -14,17 +14,32 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool;
+package com.haulmont.cuba.core.sys.connectionpoolinfo;
 
+import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.core.sys.AppContext;
 
+import javax.inject.Inject;
 import javax.management.ObjectName;
 import java.lang.management.ManagementFactory;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-public class ConnectionPoolUtils {
-    public static ObjectName getPoolObjectName(Pattern regexPattern) {
+public abstract class AbstractConnectionPoolInfo implements ConnectionPoolInfo {
+
+    @Inject
+    protected GlobalConfig globalConfig;
+    protected ObjectName registeredPoolName;
+
+    protected AbstractConnectionPoolInfo() {
+        this.registeredPoolName = getPoolObjectName(getRegexPattern());
+    }
+
+    public ObjectName getRegisteredMBeanName() {
+        return registeredPoolName;
+    }
+
+    public ObjectName getPoolObjectName(Pattern regexPattern) {
         if (regexPattern == null) {
             return null;
         }
@@ -38,7 +53,7 @@ public class ConnectionPoolUtils {
         return null;
     }
 
-    public static String getMainDatasourceName() {
+    public String getMainDatasourceName() {
         String name = "CubaDS";
         String jndiName = AppContext.getProperty("cuba.dataSourceJndiName");
         if (jndiName != null) {

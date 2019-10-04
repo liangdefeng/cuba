@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
+package com.haulmont.cuba.core.sys.connectionpoolinfo;
 
 import javax.management.*;
 import java.util.regex.Pattern;

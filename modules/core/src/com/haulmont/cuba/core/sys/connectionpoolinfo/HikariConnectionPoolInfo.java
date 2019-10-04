@@ -14,40 +14,34 @@
  * limitations under the License.
  */
 
-package com.haulmont.cuba.core.sys.connectionpool.poolinfo;
+package com.haulmont.cuba.core.sys.connectionpoolinfo;
 
-import com.haulmont.cuba.core.sys.connectionpool.ConnectionPoolUtils;
+import com.haulmont.cuba.core.global.Stores;
 import java.util.regex.Pattern;
 
-public class CommonsConnectionPoolInfo extends ConnectionPoolInfoImpl {
-
+public class HikariConnectionPoolInfo extends AbstractConnectionPoolInfo {
     @Override
     public String getPoolName() {
-        return "Commons Connection Pool";
+        return "Hikari Connection Pool";
     }
 
     @Override
     public Pattern getRegexPattern() {
-        String usualDsRegexp = String.format(
-                "Catalina:type=DataSource,host=[\\w\\d]+,context=/%s,class=javax.sql.DataSource,name=\".*%s\"",
-                globalConfig.getWebContextName(),
-                ConnectionPoolUtils.getMainDatasourceName()
-        );
-        return Pattern.compile(usualDsRegexp);
+        return Pattern.compile("^com\\.zaxxer\\.hikari:type=Pool \\(.*" + Stores.MAIN + "\\)$");
     }
 
     @Override
     public String getActiveConnectionsAttrName() {
-        return "numActive";
+        return "ActiveConnections";
     }
 
     @Override
     public String getIdleConnectionsAttrName() {
-        return "numIdle";
+        return "IdleConnections";
     }
 
     @Override
     public String getTotalConnectionsAttrName() {
-        return "maxTotal";
+        return "TotalConnections";
     }
 }
