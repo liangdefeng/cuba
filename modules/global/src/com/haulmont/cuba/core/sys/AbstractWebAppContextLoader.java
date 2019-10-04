@@ -124,19 +124,6 @@ public abstract class AbstractWebAppContextLoader extends AbstractAppContextLoad
         }
     }
 
-    protected void initActiveProfiles(ServletContext sc) {
-        String[] environmentProfiles = org.springframework.util.StringUtils.commaDelimitedListToStringArray(
-                sc.getInitParameter(AbstractEnvironment.ACTIVE_PROFILES_PROPERTY_NAME));
-
-        if (ArrayUtils.isNotEmpty(environmentProfiles)) {
-            ((ConfigurableEnvironment)AppContext.getApplicationContext().getEnvironment()).setActiveProfiles(environmentProfiles);
-            if (AppContext.getApplicationContext() instanceof AbstractRefreshableApplicationContext) {
-                ((AbstractRefreshableApplicationContext)AppContext.getApplicationContext()).refresh();
-            }
-        }
-    }
-
-
     @Override
     public void contextDestroyed(ServletContextEvent servletContextEvent) {
         ApplicationContext applicationContext = AppContext.getApplicationContext();
