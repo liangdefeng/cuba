@@ -190,9 +190,9 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
 
     protected boolean isHikariConfigField(String propertyName) {
         Method[] methods = HikariConfig.class.getMethods();
-        String setterName = "set" + propertyName.substring(0, 1).toUpperCase(Locale.ENGLISH) + propertyName.substring(1);
+        String setterName = "set".concat(StringUtils.capitalize(propertyName));
         for (Method method : methods) {
-            if (setterName.equals(method.getName())) {
+            if (setterName.equals(method.getName()) && method.getParameterCount() == 1) {
                 return true;
             }
         }
