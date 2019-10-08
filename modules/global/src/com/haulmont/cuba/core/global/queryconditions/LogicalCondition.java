@@ -90,6 +90,20 @@ public class LogicalCondition implements Condition {
     }
 
     @Override
+    public String getConditionAsText() {
+        StringBuilder result = new StringBuilder();
+        result.append("(");
+        for (Condition condition : conditions) {
+            result.append(condition.getConditionAsText());
+            if (conditions.indexOf(condition) != conditions.size() - 1) {
+                result.append(" ").append(type).append(" ");
+            }
+        }
+        result.append(")");
+        return result.toString();
+    }
+
+    @Override
     public String toString() {
         return type.toString() + " " + conditions.toString();
     }

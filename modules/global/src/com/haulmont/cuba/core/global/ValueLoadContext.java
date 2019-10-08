@@ -210,6 +210,15 @@ public class ValueLoadContext implements DataLoadContext, Serializable {
         }
 
         /**
+         * @return JPQL query string for logging with conditions and sorting
+         */
+        public String getLogQueryString() {
+            return queryString
+                    + " " + (condition == null ? "" : condition.getConditionAsText())
+                    + " " + (sort == null ? "" : sort.toString());
+        }
+
+        /**
          * @param queryString JPQL query string. Only named parameters are supported.
          */
         public void setQueryString(String queryString) {
@@ -346,6 +355,8 @@ public class ValueLoadContext implements DataLoadContext, Serializable {
         public String toString() {
             return "Query{" +
                     "queryString='" + queryString + '\'' +
+                    ", condition=" + condition +
+                    ", sort=" + sort +
                     ", firstResult=" + firstResult +
                     ", maxResults=" + maxResults +
                     '}';
