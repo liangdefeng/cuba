@@ -17,23 +17,47 @@
 package com.haulmont.cuba.security.app;
 
 import com.haulmont.cuba.core.app.ScriptValidationService;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.ScriptExecutionPolicy;
 import com.haulmont.cuba.core.global.Scripting;
+import com.haulmont.cuba.core.global.Security;
+import com.haulmont.cuba.core.global.UserSessionSource;
 import groovy.lang.Binding;
+import org.codehaus.groovy.runtime.MethodClosure;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service(ScriptValidationService.NAME)
 public class ScriptValidationServiceBean implements ScriptValidationService {
     @Inject
+    Security security;
+    @Inject
     Scripting scripting;
+    @Inject
+    UserSessionSource userSessionSource;
 
     @Override
-    public <T> T evaluateGroovy(String text, Binding binding, ScriptExecutionPolicy... policies) {
-        int x = 5;
-        System.out.println(text);
-        //noinspection unchecked
-        return (T) scripting.evaluateGroovy(text, binding, policies);
+    public <T> T evaluateConstraintScript(Entity entity, String groovyScript) {
+        System.out.println(groovyScript);
+        System.out.println("\n" );
+        System.out.println(scripting.getClass().toString());
+
+        Map<String, Object> context = new HashMap<>();
+        context.put("__entity__", entity);
+        context.put("parse", new MethodClosure(security, "parseValue"));
+        context.put("userSession", userSessionSource.getUserSession());
+        fillGroovyConstraintsContext(context);
+        return scripting.evaluateGroovy(groovyScript.replace("{E}", "__entity__"), context);
+    }
+
+    /**
+     * Override if you need specific context variables in Groovy constraints.
+     *
+     * @param context passed to Groovy evaluator
+     */
+    protected void fillGroovyConstraintsContext(Map<String, Object> context) {
     }
 }

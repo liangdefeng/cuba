@@ -16,11 +16,10 @@
 
 package com.haulmont.cuba.core.app;
 
-import com.haulmont.cuba.core.global.ScriptExecutionPolicy;
-import groovy.lang.Binding;
+import com.haulmont.cuba.core.entity.Entity;
 
 public interface ScriptValidationService {
     String NAME = "cuba_ScriptValidationService";
 
-    <T> T evaluateGroovy(String text, Binding binding, ScriptExecutionPolicy... policies);
+    <T> T evaluateConstraintScript(Entity entity, String groovyScript);
 }

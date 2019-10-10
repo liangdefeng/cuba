@@ -202,9 +202,6 @@ public abstract class AbstractScripting implements Scripting {
 
     @Override
     public <T> T evaluateGroovy(String text, Binding binding, ScriptExecutionPolicy... policies) {
-        if (scriptValidationService != null)
-            return scriptValidationService.evaluateGroovy(text, binding, policies);
-
         boolean useCompilationCache = policies == null ||
                 !Arrays.asList(policies).contains(ScriptExecutionPolicy.DO_NOT_USE_COMPILE_CACHE);
         Script script = null;
