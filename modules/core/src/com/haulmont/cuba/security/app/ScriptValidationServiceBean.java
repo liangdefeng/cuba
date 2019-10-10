@@ -18,11 +18,9 @@ package com.haulmont.cuba.security.app;
 
 import com.haulmont.cuba.core.app.ScriptValidationService;
 import com.haulmont.cuba.core.entity.Entity;
-import com.haulmont.cuba.core.global.ScriptExecutionPolicy;
-import com.haulmont.cuba.core.global.Scripting;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.core.global.UserSessionSource;
-import groovy.lang.Binding;
+import com.haulmont.cuba.core.sys.ScriptingImpl;
 import org.codehaus.groovy.runtime.MethodClosure;
 import org.springframework.stereotype.Service;
 
@@ -35,16 +33,12 @@ public class ScriptValidationServiceBean implements ScriptValidationService {
     @Inject
     Security security;
     @Inject
-    Scripting scripting;
+    ScriptingImpl scripting;
     @Inject
     UserSessionSource userSessionSource;
 
     @Override
     public <T> T evaluateConstraintScript(Entity entity, String groovyScript) {
-        System.out.println(groovyScript);
-        System.out.println("\n" );
-        System.out.println(scripting.getClass().toString());
-
         Map<String, Object> context = new HashMap<>();
         context.put("__entity__", entity);
         context.put("parse", new MethodClosure(security, "parseValue"));

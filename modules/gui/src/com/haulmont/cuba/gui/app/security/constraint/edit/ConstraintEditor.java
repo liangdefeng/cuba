@@ -387,14 +387,21 @@ public class ConstraintEditor extends AbstractEditor<Constraint> {
 
             if (!Strings.isNullOrEmpty(constraint.getGroovyScript())) {
                 try {
-//                    security.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
                     scriptValidationService.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
-                } catch (CompilationFailedException e) {
-                    showMessageDialog(getMessage("notification.error"),
-                            formatMessage("notification.scriptCompilationError", e.toString()), MessageType.WARNING_HTML);
-                    return;
                 } catch (Exception e) {
-                    // ignore
+                    if (RemoteException.class.isAssignableFrom(e.getClass()) && ((RemoteException) e).getCauses().size() > 0) {
+                        for (RemoteException.Cause cause : ((RemoteException) e).getCauses()) {
+                            try {
+                                if (CompilationFailedException.class.isAssignableFrom(Class.forName(cause.getClassName()))) {
+                                    showMessageDialog(getMessage("notification.error"),
+                                            formatMessage("notification.scriptCompilationError", e.toString()), MessageType.WARNING_HTML);
+                                    return;
+                                }
+                            } catch (ClassNotFoundException ex) {
+                                // ignore
+                            }
+                        }
+                    }
                 }
             }
 
