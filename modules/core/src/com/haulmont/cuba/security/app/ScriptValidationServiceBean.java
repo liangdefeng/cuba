@@ -35,12 +35,12 @@ public class ScriptValidationServiceBean implements ScriptValidationService {
         ScriptValidationResult result = new ScriptValidationResult(false);
         try {
             security.evaluateConstraintScript(entity, groovyScript);
-        } catch (Exception e) {
-            if (e instanceof CompilationFailedException) {
-                result.setCompilationFailedException(true);
-            }
+        } catch (CompilationFailedException e) {
+            result.setCompilationFailedException(true);
             result.setStacktrace(ExceptionUtils.getStackTrace(e));
             result.setErrorMessage(e.getMessage());
+        } catch (Exception e) {
+            // ignore
         }
         return result;
     }

@@ -17,7 +17,6 @@
 
 package com.haulmont.cuba.client.sys;
 
-import com.haulmont.cuba.core.app.ScriptValidationService;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.core.global.Scripting;
@@ -34,9 +33,8 @@ public class ScriptingClientImpl extends AbstractScripting {
     private String[] scriptEngineRoots;
 
     @Inject
-    public ScriptingClientImpl(JavaClassLoader javaClassLoader, Configuration configuration, SpringBeanLoader springBeanLoader, ScriptValidationService scriptValidationService) {
+    public ScriptingClientImpl(JavaClassLoader javaClassLoader, Configuration configuration, SpringBeanLoader springBeanLoader) {
         super(javaClassLoader, configuration, springBeanLoader);
-        setScriptValidationService(scriptValidationService);
         scriptEngineRoots = new String[] {
                 configuration.getConfig(GlobalConfig.class).getConfDir()
         };

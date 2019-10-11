@@ -17,7 +17,6 @@
 
 package com.haulmont.cuba.core.sys;
 
-import com.haulmont.cuba.core.app.ScriptValidationService;
 import com.haulmont.cuba.core.global.Configuration;
 import com.haulmont.cuba.core.global.GlobalConfig;
 import com.haulmont.cuba.core.global.ScriptExecutionPolicy;
@@ -63,7 +62,6 @@ public abstract class AbstractScripting implements Scripting {
     protected JavaClassLoader javaClassLoader;
     protected SpringBeanLoader springBeanLoader;
     protected String groovyClassPath;
-    protected ScriptValidationService scriptValidationService;
 
     protected Set<String> imports = new HashSet<>();
 
@@ -103,10 +101,6 @@ public abstract class AbstractScripting implements Scripting {
                 imports.add(string.trim());
             }
         }
-    }
-
-    public void setScriptValidationService(ScriptValidationService scriptValidationService) {
-        this.scriptValidationService = scriptValidationService;
     }
 
     protected abstract String[] getScriptEngineRootPath();
