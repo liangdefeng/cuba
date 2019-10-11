@@ -345,13 +345,14 @@ public class ValueLoadContext implements DataLoadContext, Serializable {
 
         @Override
         public String toString() {
-            return "Query{" +
-                    "queryString='" + StringHelper.removeExtraSpaces(queryString.replace('\n', ' ')) + '\'' +
+            String stringResult = "Query{" +
+                    "queryString='" + queryString + '\'' +
                     ", condition=" + condition +
                     ", sort=" + sort +
                     ", firstResult=" + firstResult +
                     ", maxResults=" + maxResults +
-                    '}';
+                    "}";
+            return StringHelper.removeExtraSpaces(stringResult.replace('\n', ' '));
         }
     }
 }
