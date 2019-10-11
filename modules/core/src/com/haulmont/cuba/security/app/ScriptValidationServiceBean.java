@@ -19,39 +19,29 @@ package com.haulmont.cuba.security.app;
 import com.haulmont.cuba.core.app.ScriptValidationService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Security;
-import com.haulmont.cuba.core.global.UserSessionSource;
-import com.haulmont.cuba.core.sys.ScriptingImpl;
-import org.codehaus.groovy.runtime.MethodClosure;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.codehaus.groovy.control.CompilationFailedException;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service(ScriptValidationService.NAME)
 public class ScriptValidationServiceBean implements ScriptValidationService {
     @Inject
     Security security;
-    @Inject
-    ScriptingImpl scripting;
-    @Inject
-    UserSessionSource userSessionSource;
 
     @Override
-    public <T> T evaluateConstraintScript(Entity entity, String groovyScript) {
-        Map<String, Object> context = new HashMap<>();
-        context.put("__entity__", entity);
-        context.put("parse", new MethodClosure(security, "parseValue"));
-        context.put("userSession", userSessionSource.getUserSession());
-        fillGroovyConstraintsContext(context);
-        return scripting.evaluateGroovy(groovyScript.replace("{E}", "__entity__"), context);
-    }
-
-    /**
-     * Override if you need specific context variables in Groovy constraints.
-     *
-     * @param context passed to Groovy evaluator
-     */
-    protected void fillGroovyConstraintsContext(Map<String, Object> context) {
+    public ScriptValidationResult evaluateConstraintScript(Entity entity, String groovyScript) {
+        ScriptValidationResult result = new ScriptValidationResult(false);
+        try {
+            security.evaluateConstraintScript(entity, groovyScript);
+        } catch (Exception e) {
+            if (e instanceof CompilationFailedException) {
+                result.setCompilationFailedException(true);
+            }
+            result.setStacktrace(ExceptionUtils.getStackTrace(e));
+            result.setErrorMessage(e.getMessage());
+        }
+        return result;
     }
 }

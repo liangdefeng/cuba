@@ -50,7 +50,6 @@ import com.haulmont.cuba.security.entity.FilterEntity;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.text.TextStringBuilder;
-import org.codehaus.groovy.control.CompilationFailedException;
 import org.dom4j.Element;
 
 import javax.inject.Inject;
@@ -386,26 +385,16 @@ public class ConstraintEditor extends AbstractEditor<Constraint> {
             }
 
             if (!Strings.isNullOrEmpty(constraint.getGroovyScript())) {
-                try {
-                    scriptValidationService.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
-                } catch (Exception e) {
-                    if (RemoteException.class.isAssignableFrom(e.getClass()) && ((RemoteException) e).getCauses().size() > 0) {
-                        for (RemoteException.Cause cause : ((RemoteException) e).getCauses()) {
-                            try {
-                                if (CompilationFailedException.class.isAssignableFrom(Class.forName(cause.getClassName()))) {
-                                    showMessageDialog(getMessage("notification.error"),
-                                            formatMessage("notification.scriptCompilationError", e.toString()), MessageType.WARNING_HTML);
-                                    return;
-                                }
-                            } catch (ClassNotFoundException ex) {
-                                // ignore
-                            }
-                        }
-                    }
+                ScriptValidationService.ScriptValidationResult result =
+                        scriptValidationService.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
+                if (result.isCompilationFailedException()) {
+                    showMessageDialog(getMessage("notification.error"),
+                                formatMessage("notification.scriptCompilationError", result.getErrorMessage()), MessageType.WARNING_HTML);
+                    return;
                 }
             }
-
-            showNotification(getMessage("notification.success"), NotificationType.HUMANIZED);
         }
+
+        showNotification(getMessage("notification.success"), NotificationType.HUMANIZED);
     }
 }

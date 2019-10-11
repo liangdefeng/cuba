@@ -18,8 +18,50 @@ package com.haulmont.cuba.core.app;
 
 import com.haulmont.cuba.core.entity.Entity;
 
+import java.io.Serializable;
+
 public interface ScriptValidationService {
     String NAME = "cuba_ScriptValidationService";
 
-    <T> T evaluateConstraintScript(Entity entity, String groovyScript);
+    ScriptValidationResult evaluateConstraintScript(Entity entity, String groovyScript);
+
+    class ScriptValidationResult implements Serializable {
+        boolean isCompilationFailedException = false;
+        String stacktrace;
+        String errorMessage;
+
+        public ScriptValidationResult(boolean isCompilationFailedException) {
+            this.isCompilationFailedException = isCompilationFailedException;
+        }
+
+        public ScriptValidationResult(boolean isCompilationFailedException, String stacktrace, String errorMessage) {
+            this.isCompilationFailedException = isCompilationFailedException;
+            this.stacktrace = stacktrace;
+            this.errorMessage = errorMessage;
+        }
+
+        public boolean isCompilationFailedException() {
+            return isCompilationFailedException;
+        }
+
+        public void setCompilationFailedException(boolean compilationFailedException) {
+            isCompilationFailedException = compilationFailedException;
+        }
+
+        public String getStacktrace() {
+            return stacktrace;
+        }
+
+        public void setStacktrace(String stacktrace) {
+            this.stacktrace = stacktrace;
+        }
+
+        public String getErrorMessage() {
+            return errorMessage;
+        }
+
+        public void setErrorMessage(String errorMessage) {
+            this.errorMessage = errorMessage;
+        }
+    }
 }
