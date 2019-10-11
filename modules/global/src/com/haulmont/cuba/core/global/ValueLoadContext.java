@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.core.global;
 
+import com.haulmont.bali.util.StringHelper;
 import com.haulmont.cuba.core.global.queryconditions.Condition;
 
 import javax.annotation.Nullable;
@@ -210,15 +211,6 @@ public class ValueLoadContext implements DataLoadContext, Serializable {
         }
 
         /**
-         * @return JPQL query string for logging with conditions and sorting
-         */
-        public String getLogQueryString() {
-            return queryString
-                    + " " + (condition == null ? "" : condition.getConditionAsText())
-                    + " " + (sort == null ? "" : sort.toString());
-        }
-
-        /**
          * @param queryString JPQL query string. Only named parameters are supported.
          */
         public void setQueryString(String queryString) {
@@ -354,7 +346,7 @@ public class ValueLoadContext implements DataLoadContext, Serializable {
         @Override
         public String toString() {
             return "Query{" +
-                    "queryString='" + queryString + '\'' +
+                    "queryString='" + StringHelper.removeExtraSpaces(queryString.replace('\n', ' ')) + '\'' +
                     ", condition=" + condition +
                     ", sort=" + sort +
                     ", firstResult=" + firstResult +

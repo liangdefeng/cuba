@@ -17,6 +17,7 @@
 package com.haulmont.cuba.core.global;
 
 import com.haulmont.bali.util.Preconditions;
+import com.haulmont.bali.util.StringHelper;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.queryconditions.Condition;
@@ -374,15 +375,6 @@ public class LoadContext<E extends Entity> implements DataLoadContext, Serializa
         }
 
         /**
-         * @return JPQL query string for logging with conditions and sorting
-         */
-        public String getLogQueryString() {
-            return queryString
-                    + " " + (condition == null ? "" : condition.getConditionAsText())
-                    + " " + (sort == null ? "" : sort.toString());
-        }
-
-        /**
          * @param queryString JPQL query string. Only named parameters are supported.
          */
         public Query setQueryString(String queryString) {
@@ -571,7 +563,7 @@ public class LoadContext<E extends Entity> implements DataLoadContext, Serializa
         @Override
         public String toString() {
             return "Query{" +
-                    "queryString='" + queryString + '\'' +
+                    "queryString='" + StringHelper.removeExtraSpaces(queryString.replace('\n', ' ')) + '\'' +
                     ", condition=" + condition +
                     ", sort=" + sort +
                     ", firstResult=" + firstResult +

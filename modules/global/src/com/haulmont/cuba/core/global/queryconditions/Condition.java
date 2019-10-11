@@ -26,9 +26,4 @@ public interface Condition extends Serializable {
      * Returns a deep copy of this condition.
      */
     Condition copy();
-
-    /**
-     * Returns a human-readable format of this condition.
-     */
-    String getConditionAsText();
 }

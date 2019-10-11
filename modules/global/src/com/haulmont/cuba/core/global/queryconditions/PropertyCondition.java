@@ -60,12 +60,7 @@ public abstract class PropertyCondition implements Condition {
     }
 
     @Override
-    public String getConditionAsText() {
-        return entries.toString();
-    }
-
-    @Override
     public String toString() {
-        return "PropertyCondition{" + entries.toString() + "}";
+        return entries.toString();
     }
 }
