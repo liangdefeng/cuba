@@ -37,6 +37,13 @@
                               allowCommit="false"
                               view="_local"
                               datasourceClass="com.haulmont.cuba.gui.app.security.ds.EntityPermissionTargetsDatasource"/>
+
+        <collectionDatasource id="propertyPermissionsDs"
+                              class="com.haulmont.cuba.security.entity.Permission"
+                              view="role.edit"
+                              datasourceClass="com.haulmont.cuba.gui.app.security.ds.RestorablePermissionDatasource">
+            <query>select p from sec$Permission p where p.role.id = :ds$roleDs.id and p.type = 30</query>
+        </collectionDatasource>
     </dsContext>
 
     <layout expand="contentPane">

@@ -33,6 +33,7 @@ import com.haulmont.cuba.gui.components.FieldGroupFieldFactory;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.data.Datasource;
 import com.haulmont.cuba.gui.data.DsContext;
+import com.haulmont.cuba.gui.data.impl.EmbeddedDatasourceImpl;
 import com.haulmont.cuba.gui.dynamicattributes.DynamicAttributesGuiTools;
 import com.haulmont.cuba.gui.screen.compatibility.LegacyFrame;
 import com.haulmont.cuba.gui.xml.DeclarativeFieldGenerator;
@@ -135,7 +136,7 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
                 Iterable<FieldGroup.FieldConfig> columnFields = loadFields(resultComponent, columnElement, ds, columnWidth);
                 if (colIndex == 0) {
-                     columnFields = Iterables.concat(columnFields, loadDynamicAttributeFields(ds));
+                    columnFields = Iterables.concat(columnFields, loadDynamicAttributeFields(ds));
                 }
                 for (FieldGroup.FieldConfig field : columnFields) {
                     resultComponent.addField(field, colIndex);
@@ -643,7 +644,9 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
             checkNotNullArgument(propertyPath, "Could not resolve property path '%s' in '%s'", field.getId(), metaClass);
 
-            if (!getSecurity().isEntityAttrUpdatePermitted(metaClass, propertyPath.toString())) {
+            if (!getSecurity().isEntityAttrUpdatePermitted(metaClass, propertyPath.toString()) ||
+                    (getMetadataTools().isEmbeddable(metaClass) &&
+                            !getSecurity().isEntityAttrUpdatePermitted(getParentEntityMetaClass(resultComponent), getEmbeddedPropertyPath(field)))) {
                 field.setEditable(false);
             }
         }
@@ -664,10 +667,20 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
             checkNotNullArgument(propertyPath, "Could not resolve property path '%s' in '%s'", field.getId(), metaClass);
 
-            if (!getSecurity().isEntityAttrReadPermitted(metaClass, propertyPath.toString())) {
+            if (!getSecurity().isEntityAttrReadPermitted(metaClass, propertyPath.toString()) ||
+                    (getMetadataTools().isEmbeddable(metaClass) &&
+                            !getSecurity().isEntityAttrReadPermitted(getParentEntityMetaClass(resultComponent), getEmbeddedPropertyPath(field)))) {
                 field.setVisible(false);
             }
         }
+    }
+
+    protected MetaClass getParentEntityMetaClass(FieldGroup resultComponent) {
+        return resultComponent.getDatasource().getMetaClass();
+    }
+
+    protected String getEmbeddedPropertyPath(FieldGroup.FieldConfig embeddedField) {
+        return ((EmbeddedDatasourceImpl) embeddedField.getDatasource()).getProperty().getName();
     }
 
     protected void loadEnable(FieldGroup resultComponent, FieldGroup.FieldConfig field) {
