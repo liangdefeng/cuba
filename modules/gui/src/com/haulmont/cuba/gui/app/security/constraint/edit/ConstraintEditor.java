@@ -19,7 +19,7 @@ package com.haulmont.cuba.gui.app.security.constraint.edit;
 
 import com.google.common.base.Strings;
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.cuba.core.app.ScriptValidationService;
+import com.haulmont.cuba.core.app.ConstraintScriptValidationService;
 import com.haulmont.cuba.core.entity.BaseGenericIdEntity;
 import com.haulmont.cuba.core.entity.annotation.UnavailableInSecurityConstraints;
 import com.haulmont.cuba.core.global.*;
@@ -60,7 +60,7 @@ import static java.util.Arrays.asList;
 
 public class ConstraintEditor extends AbstractEditor<Constraint> {
     @Inject
-    private ScriptValidationService scriptValidationService;
+    private ConstraintScriptValidationService constraintScriptValidationService;
     @Inject
     protected LookupField<String> entityName;
     @Inject
@@ -385,8 +385,8 @@ public class ConstraintEditor extends AbstractEditor<Constraint> {
             }
 
             if (!Strings.isNullOrEmpty(constraint.getGroovyScript())) {
-                ScriptValidationService.ScriptValidationResult result =
-                        scriptValidationService.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
+                ConstraintScriptValidationService.ScriptValidationResult result =
+                        constraintScriptValidationService.evaluateConstraintScript(metadata.create(entityName), constraint.getGroovyScript());
                 if (result.isCompilationFailedException()) {
                     showMessageDialog(getMessage("notification.error"),
                                 formatMessage("notification.scriptCompilationError", result.getErrorMessage()), MessageType.WARNING_HTML);

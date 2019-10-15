@@ -16,7 +16,7 @@
 
 package com.haulmont.cuba.security.app;
 
-import com.haulmont.cuba.core.app.ScriptValidationService;
+import com.haulmont.cuba.core.app.ConstraintScriptValidationService;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Security;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -25,8 +25,8 @@ import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
-@Service(ScriptValidationService.NAME)
-public class ScriptValidationServiceBean implements ScriptValidationService {
+@Service(ConstraintScriptValidationService.NAME)
+public class ConstraintScriptValidationServiceBean implements ConstraintScriptValidationService {
     @Inject
     Security security;
 

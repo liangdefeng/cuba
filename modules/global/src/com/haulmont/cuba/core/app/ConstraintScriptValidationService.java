@@ -20,8 +20,8 @@ import com.haulmont.cuba.core.entity.Entity;
 
 import java.io.Serializable;
 
-public interface ScriptValidationService {
-    String NAME = "cuba_ScriptValidationService";
+public interface ConstraintScriptValidationService {
+    String NAME = "cuba_ConstraintScriptValidationService";
 
     ScriptValidationResult evaluateConstraintScript(Entity entity, String groovyScript);
 
