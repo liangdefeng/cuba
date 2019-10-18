@@ -646,7 +646,7 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
             if (!getSecurity().isEntityAttrUpdatePermitted(metaClass, propertyPath.toString()) ||
                     (getMetadataTools().isEmbeddable(metaClass) &&
-                            !getSecurity().isEntityAttrUpdatePermitted(getParentEntityMetaClass(resultComponent), getEmbeddedPropertyPath(field)))) {
+                            !getSecurity().isEntityOpPermitted(getParentEntityMetaClass(resultComponent), EntityOp.UPDATE))) {
                 field.setEditable(false);
             }
         }
@@ -667,9 +667,7 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
             checkNotNullArgument(propertyPath, "Could not resolve property path '%s' in '%s'", field.getId(), metaClass);
 
-            if (!getSecurity().isEntityAttrReadPermitted(metaClass, propertyPath.toString()) ||
-                    (getMetadataTools().isEmbeddable(metaClass) &&
-                            !getSecurity().isEntityAttrReadPermitted(getParentEntityMetaClass(resultComponent), getEmbeddedPropertyPath(field)))) {
+            if (!getSecurity().isEntityAttrReadPermitted(metaClass, propertyPath.toString())) {
                 field.setVisible(false);
             }
         }
@@ -677,10 +675,6 @@ public class FieldGroupLoader extends AbstractComponentLoader<FieldGroup> {
 
     protected MetaClass getParentEntityMetaClass(FieldGroup resultComponent) {
         return resultComponent.getDatasource().getMetaClass();
-    }
-
-    protected String getEmbeddedPropertyPath(FieldGroup.FieldConfig embeddedField) {
-        return ((EmbeddedDatasourceImpl) embeddedField.getDatasource()).getProperty().getName();
     }
 
     protected void loadEnable(FieldGroup resultComponent, FieldGroup.FieldConfig field) {

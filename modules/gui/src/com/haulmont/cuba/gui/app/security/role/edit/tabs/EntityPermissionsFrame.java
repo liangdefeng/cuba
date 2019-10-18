@@ -18,15 +18,11 @@
 package com.haulmont.cuba.gui.app.security.role.edit.tabs;
 
 import com.haulmont.chile.core.model.MetaClass;
-import com.haulmont.chile.core.model.MetaProperty;
-import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.Metadata;
-import com.haulmont.cuba.core.global.MetadataTools;
 import com.haulmont.cuba.core.global.PersistenceHelper;
 import com.haulmont.cuba.core.global.Security;
 import com.haulmont.cuba.gui.app.security.ds.EntityPermissionTargetsDatasource;
 import com.haulmont.cuba.gui.app.security.ds.RestorablePermissionDatasource;
-import com.haulmont.cuba.gui.app.security.entity.AttributePermissionVariant;
 import com.haulmont.cuba.gui.app.security.entity.OperationPermissionTarget;
 import com.haulmont.cuba.gui.app.security.entity.PermissionVariant;
 import com.haulmont.cuba.gui.app.security.role.edit.PermissionUiHelper;
@@ -59,9 +55,6 @@ public class EntityPermissionsFrame extends AbstractFrame {
     protected RestorablePermissionDatasource entityPermissionsDs;
 
     @Inject
-    private RestorablePermissionDatasource propertyPermissionsDs;
-
-    @Inject
     protected EntityPermissionTargetsDatasource entityTargetsDs;
 
     @Inject
@@ -81,9 +74,6 @@ public class EntityPermissionsFrame extends AbstractFrame {
 
     @Inject
     protected Metadata metadata;
-
-    @Inject
-    protected MetadataTools metadataTools;
 
     /* Filter */
 
@@ -550,7 +540,6 @@ public class EntityPermissionsFrame extends AbstractFrame {
                 int value = PermissionUiHelper.getPermissionValue(permissionVariant);
                 PermissionUiHelper.createPermissionItem(entityPermissionsDs, roleDs,
                         permissionValue, PermissionType.ENTITY_OP, value);
-                applyToEmbeddedChildAttributes(target, permissionVariant, operation);
             } else {
                 // Remove permission
                 Permission permission = null;
@@ -563,19 +552,6 @@ public class EntityPermissionsFrame extends AbstractFrame {
 
                 if (permission != null)
                     entityPermissionsDs.removeItem(permission);
-            }
-        }
-    }
-
-    protected void applyToEmbeddedChildAttributes(OperationPermissionTarget target, PermissionVariant permissionVariant, EntityOp operation) {
-        MetaClass metaClass = target.getEntityMetaClass();
-        for (MetaProperty metaProperty : metaClass.getOwnProperties()) {
-            if (Entity.class.isAssignableFrom(metaProperty.getJavaType()) && metadataTools.isEmbeddable(metaProperty.getJavaType())) {
-                String permissionValue = target.getPermissionValue() + Permission.TARGET_PATH_DELIMETER + metaProperty.getName();
-                if ("update".equals(operation.getId()) && PermissionVariant.DISALLOWED.equals(permissionVariant)) {
-                    PermissionUiHelper.createPermissionItem(propertyPermissionsDs, roleDs,
-                            permissionValue, PermissionType.ENTITY_ATTR, AttributePermissionVariant.READ_ONLY.getId());
-                }
             }
         }
     }
