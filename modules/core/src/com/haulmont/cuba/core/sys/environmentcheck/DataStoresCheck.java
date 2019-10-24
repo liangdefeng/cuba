@@ -90,7 +90,7 @@ public class DataStoresCheck implements EnvironmentCheck {
                 dataSource.unwrap(HikariDataSource.class).close();
             }
         } catch (SQLException | ClassCastException e) {
-            e.printStackTrace();
+            log.error("Can't close sanity application data source.", e);
         }
     }
 
