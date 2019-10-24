@@ -20,7 +20,9 @@ import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.cuba.core.sys.AppContext;
 import com.haulmont.cuba.core.sys.ApplicationDataSourceInitialization;
 import com.haulmont.cuba.core.sys.dbupdate.DbProperties;
+import com.haulmont.cuba.core.sys.jdbc.ProxyDataSource;
 import com.haulmont.cuba.core.sys.persistence.DbmsSpecificFactory;
+import com.zaxxer.hikari.HikariDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.datasource.lookup.DataSourceLookup;
@@ -31,6 +33,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +45,7 @@ public class DataStoresCheck implements EnvironmentCheck {
     public List<CheckFailedResult> doCheck() {
         List<CheckFailedResult> result = new ArrayList<>();
 
-        DataSource dataSource;
+        DataSource dataSource = null;
         try {
             dataSource = getDataSource(Stores.MAIN);
             List<CheckFailedResult> checkFailedResults = checkDataStore(Stores.MAIN, dataSource);
@@ -51,6 +54,8 @@ public class DataStoresCheck implements EnvironmentCheck {
             }
         } catch (DataSourceLookupFailureException e) {
             result.add(new CheckFailedResult("Can not find JNDI datasource for Data Store: Main", e));
+        } finally {
+            closeApplicationDataSource(Stores.MAIN, dataSource);
         }
 
         String additionalStores = AppContext.getProperty("cuba.additionalStores");
@@ -69,23 +74,35 @@ public class DataStoresCheck implements EnvironmentCheck {
                                 String.format("Can not find JNDI datasource for Data Store: %s", storeName),
                                 null));
                     }
+                } finally {
+                    closeApplicationDataSource(storeName, dataSource);
                 }
             }
         }
         return result;
     }
 
+    protected void closeApplicationDataSource(String storeName, DataSource dataSource) {
+        String dataSourceProvider = getDataSourceProvider(storeName);
+        try {
+            if ("application".equals(dataSourceProvider) && dataSource != null &&
+                    ProxyDataSource.class.isAssignableFrom(dataSource.getClass()) && dataSource.isWrapperFor(HikariDataSource.class)) {
+                dataSource.unwrap(HikariDataSource.class).close();
+            }
+        } catch (SQLException | ClassCastException e) {
+            e.printStackTrace();
+        }
+    }
+
     protected DataSource getDataSource(String storeName) {
+        String dataSourceProvider = getDataSourceProvider(storeName);
         String defaultJndiValue;
         String dsJndiName;
-        String dataSourceProvider;
 
         if (Stores.MAIN.equals(storeName)) {
-            dataSourceProvider = AppContext.getProperty("cuba.dataSourceProvider");
             dsJndiName = AppContext.getProperty("cuba.dataSourceJndiName");
             defaultJndiValue = "jdbc/CubaDS";
         } else {
-            dataSourceProvider = AppContext.getProperty("cuba.dataSourceProvider_" + storeName);
             dsJndiName = AppContext.getProperty("cuba.dataSourceJndiName_" + storeName);
             defaultJndiValue = "";
         }
@@ -96,14 +113,22 @@ public class DataStoresCheck implements EnvironmentCheck {
         }
         if ("application".equals(dataSourceProvider)) {
             ApplicationDataSourceInitialization appDataSourceInit = new ApplicationDataSourceInitialization();
-            return appDataSourceInit.getApplicationDataSource(storeName, true);
+            return appDataSourceInit.getApplicationDataSource(storeName);
         }
         throw new RuntimeException(String.format("DataSource provider '%s' is unsupported! Available: 'jndi', 'application'", dataSourceProvider));
     }
 
+    protected String getDataSourceProvider(String storeName) {
+        if (Stores.MAIN.equals(storeName)) {
+            return AppContext.getProperty("cuba.dataSourceProvider");
+        } else {
+            return AppContext.getProperty("cuba.dataSourceProvider_" + storeName);
+        }
+    }
+
     protected List<CheckFailedResult> checkDataStore(String storeName, DataSource dataSource) {
         List<CheckFailedResult> result = new ArrayList<>();
-        try (Connection connection = dataSource.getConnection()){
+        try (Connection connection = dataSource.getConnection()) {
             log.info("Checking connection to data store {}", Stores.storeNameToString(storeName));
 
             DatabaseMetaData dbMetaData = connection.getMetaData();

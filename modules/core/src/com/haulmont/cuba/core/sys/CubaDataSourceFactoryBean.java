@@ -50,7 +50,7 @@ public class CubaDataSourceFactoryBean extends CubaJndiObjectFactoryBean {
         }
         if ("application".equals(dataSourceProvider)) {
             ApplicationDataSourceInitialization applicationDataSourceInitialization = new ApplicationDataSourceInitialization();
-            return applicationDataSourceInitialization.getApplicationDataSource(storeName, false);
+            return applicationDataSourceInitialization.getApplicationDataSource(storeName);
         }
         throw new RuntimeException(String.format("DataSource provider '%s' is unsupported! Available: 'jndi', 'application'", dataSourceProvider));
     }

@@ -45,20 +45,19 @@ public class ApplicationDataSourceInitialization {
     protected static final String CONNECTION_PARAMS = "connectionParams";
     protected static final ImmutableList<String> cubaDsDefaultParams = ImmutableList.of(HOST, PORT, DB_NAME, CONNECTION_PARAMS);
 
-    public DataSource getApplicationDataSource(String storeName, boolean isSanityCheck) {
+    public DataSource getApplicationDataSource(String storeName) {
         if (storeName == null) {
             storeName = Stores.MAIN;
         }
         Properties hikariConfigProperties = getHikariConfigProperties(storeName);
         HikariConfig config = new HikariConfig(hikariConfigProperties);
 
-        if(!isSanityCheck) {
-            config.setRegisterMbeans(true);
-        }
+        config.setRegisterMbeans(true);
 
         config.setPoolName("HikariPool-" + storeName);
 
         HikariDataSource ds = new HikariDataSource(config);
+
         return new ProxyDataSource(ds);
     }
 
