@@ -23,8 +23,8 @@ import com.haulmont.cuba.gui.components.data.HasValueSource;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.ValueSource;
 import com.haulmont.cuba.gui.components.data.options.DatasourceOptions;
-import com.haulmont.cuba.gui.components.data.options.ListOptions;
-import com.haulmont.cuba.gui.components.data.options.MapOptions;
+import com.haulmont.cuba.gui.components.data.options.ListEntityOptions;
+import com.haulmont.cuba.gui.components.data.options.MapEntityOptions;
 import com.haulmont.cuba.gui.components.data.value.LegacyCollectionDsValueSource;
 import com.haulmont.cuba.gui.data.CollectionDatasource;
 import com.haulmont.cuba.gui.screen.LookupScreen;
@@ -186,8 +186,8 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
     @Deprecated
     default List getOptionsList() {
         Options<V> options = getOptions();
-        if (options instanceof ListOptions) {
-            return (List) ((ListOptions<V>) options).getItemsCollection();
+        if (options instanceof ListEntityOptions) {
+            return (List) ((ListEntityOptions<V>) options).getItemsCollection();
         }
         return null;
     }
@@ -197,7 +197,7 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      */
     @SuppressWarnings("unchecked")
     default void setOptionsList(List optionsList) {
-        setOptions(new ListOptions<>(optionsList));
+        setOptions(new ListEntityOptions<V>(optionsList));
     }
 
     /**
@@ -207,10 +207,10 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      */
     @SuppressWarnings("unchecked")
     @Deprecated
-    default Map<String, ?> getOptionsMap() {
-        Options options = getOptions();
-        if (options instanceof MapOptions) {
-            return ((MapOptions) options).getItemsCollection();
+    default Map<String, V> getOptionsMap() {
+        Options<V> options = getOptions();
+        if (options instanceof MapEntityOptions) {
+            return ((MapEntityOptions<V>) options).getItemsCollection();
         }
         return null;
     }
@@ -219,8 +219,8 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      * @param optionsMap options map
      */
     @SuppressWarnings("unchecked")
-    default void setOptionsMap(Map<String, ?> optionsMap) {
-        setOptions(new MapOptions(optionsMap));
+    default void setOptionsMap(Map<String, V> optionsMap) {
+        setOptions(new MapEntityOptions<>(optionsMap));
     }
 
     /**
