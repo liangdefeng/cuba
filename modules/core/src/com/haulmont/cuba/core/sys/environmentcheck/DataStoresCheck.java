@@ -18,10 +18,12 @@ package com.haulmont.cuba.core.sys.environmentcheck;
 
 import com.haulmont.cuba.core.global.Stores;
 import com.haulmont.cuba.core.sys.AppContext;
+import com.haulmont.cuba.core.sys.ApplicationDataSourceInitialization;
 import com.haulmont.cuba.core.sys.dbupdate.DbProperties;
 import com.haulmont.cuba.core.sys.persistence.DbmsSpecificFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.lookup.DataSourceLookup;
 import org.springframework.jdbc.datasource.lookup.DataSourceLookupFailureException;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
@@ -39,11 +41,10 @@ public class DataStoresCheck implements EnvironmentCheck {
     @Override
     public List<CheckFailedResult> doCheck() {
         List<CheckFailedResult> result = new ArrayList<>();
-        JndiDataSourceLookup lookup = new JndiDataSourceLookup();
+
         DataSource dataSource;
-        String mainDsJndiName = AppContext.getProperty("cuba.dataSourceJndiName");
         try {
-            dataSource = lookup.getDataSource(mainDsJndiName == null ? "jdbc/CubaDS" : mainDsJndiName);
+            dataSource = getDataSource(Stores.MAIN);
             List<CheckFailedResult> checkFailedResults = checkDataStore(Stores.MAIN, dataSource);
             if (!checkFailedResults.isEmpty()) {
                 result.addAll(checkFailedResults);
@@ -55,9 +56,8 @@ public class DataStoresCheck implements EnvironmentCheck {
         String additionalStores = AppContext.getProperty("cuba.additionalStores");
         if (additionalStores != null && Boolean.valueOf(AppContext.getProperty("cuba.checkConnectionToAdditionalDataStoresOnStartup"))) {
             for (String storeName : additionalStores.replaceAll("\\s", "").split(",")) {
-                String storeJndiName = AppContext.getProperty("cuba.dataSourceJndiName_" + storeName);
                 try {
-                    dataSource = lookup.getDataSource(storeJndiName == null ? "" : storeJndiName);
+                    dataSource = getDataSource(storeName);
                     List<CheckFailedResult> checkFailedResults = checkDataStore(storeName, dataSource);
                     if (!checkFailedResults.isEmpty()) {
                         result.addAll(checkFailedResults);
@@ -75,13 +75,37 @@ public class DataStoresCheck implements EnvironmentCheck {
         return result;
     }
 
+    protected DataSource getDataSource(String storeName) {
+        String defaultJndiValue;
+        String dsJndiName;
+        String dataSourceProvider;
+
+        if (Stores.MAIN.equals(storeName)) {
+            dataSourceProvider = AppContext.getProperty("cuba.dataSourceProvider");
+            dsJndiName = AppContext.getProperty("cuba.dataSourceJndiName");
+            defaultJndiValue = "jdbc/CubaDS";
+        } else {
+            dataSourceProvider = AppContext.getProperty("cuba.dataSourceProvider_" + storeName);
+            dsJndiName = AppContext.getProperty("cuba.dataSourceJndiName_" + storeName);
+            defaultJndiValue = "";
+        }
+
+        if (dataSourceProvider == null || "jndi".equals(dataSourceProvider)) {
+            DataSourceLookup lookup = new JndiDataSourceLookup();
+            return lookup.getDataSource(dsJndiName == null ? defaultJndiValue : dsJndiName);
+        }
+        if ("application".equals(dataSourceProvider)) {
+            ApplicationDataSourceInitialization appDataSourceInit = new ApplicationDataSourceInitialization();
+            return appDataSourceInit.getApplicationDataSource(storeName, true);
+        }
+        throw new RuntimeException(String.format("DataSource provider '%s' is unsupported! Available: 'jndi', 'application'", dataSourceProvider));
+    }
+
     protected List<CheckFailedResult> checkDataStore(String storeName, DataSource dataSource) {
         List<CheckFailedResult> result = new ArrayList<>();
-        Connection connection = null;
-        try {
+        try (Connection connection = dataSource.getConnection()){
             log.info("Checking connection to data store {}", Stores.storeNameToString(storeName));
 
-            connection = dataSource.getConnection();
             DatabaseMetaData dbMetaData = connection.getMetaData();
 
             if (Stores.isMain(storeName) && !Boolean.TRUE.equals(Boolean.parseBoolean(AppContext.getProperty("cuba.automaticDatabaseUpdate")))) {
@@ -106,16 +130,6 @@ public class DataStoresCheck implements EnvironmentCheck {
         } catch (Throwable e) {
             result.add(new CheckFailedResult(
                     String.format("Exception occurred while connecting to Data Store: %s", storeName), e));
-        } finally {
-            try {
-                if (connection != null) {
-                    connection.close();
-                }
-            } catch (Throwable e) {
-                result.add(new CheckFailedResult(
-                        String.format("Exception occurred while closing connection to Data Store: %s", storeName),
-                        e));
-            }
         }
         return result;
     }
