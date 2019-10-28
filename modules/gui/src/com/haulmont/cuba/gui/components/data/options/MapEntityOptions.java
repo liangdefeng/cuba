@@ -16,7 +16,6 @@
 
 package com.haulmont.cuba.gui.components.data.options;
 
-import com.haulmont.bali.events.EventHub;
 import com.haulmont.bali.events.Subscription;
 import com.haulmont.bali.events.sys.VoidSubscription;
 import com.haulmont.chile.core.model.MetaClass;
@@ -35,8 +34,6 @@ import java.util.function.Consumer;
  * @param <E> entity type
  */
 public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements Options<E>, EntityOptions<E> {
-
-    protected EventHub events = new EventHub();
 
     protected E selectedItem = null;
 
