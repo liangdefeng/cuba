@@ -18,7 +18,7 @@
 package com.haulmont.cuba.gui.components.filter;
 
 import com.haulmont.bali.util.Dom4j;
-import com.haulmont.cuba.core.entity.BaseUuidEntity;
+import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.core.global.filter.ConditionType;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -80,7 +80,7 @@ public class UserSetHelper {
     public static String createIdsString(Set<String> current, Collection entities) {
         Set<String> convertedSet = new HashSet<>();
         for (Object entity : entities) {
-            convertedSet.add(((BaseUuidEntity) entity).getId().toString());
+            convertedSet.add(((Entity) entity).getId().toString());
         }
         current.addAll(convertedSet);
         if (current.isEmpty()) {
@@ -100,7 +100,7 @@ public class UserSetHelper {
     public static String removeIds(Set<String> current, Collection entities) {
         Set<String> convertedSet = new HashSet<>();
         for (Object entity : entities) {
-            convertedSet.add(((BaseUuidEntity) entity).getId().toString());
+            convertedSet.add(((Entity) entity).getId().toString());
         }
         current.removeAll(convertedSet);
         if (current.isEmpty()) {
