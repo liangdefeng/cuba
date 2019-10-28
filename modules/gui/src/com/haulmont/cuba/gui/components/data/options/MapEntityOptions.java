@@ -18,13 +18,15 @@ package com.haulmont.cuba.gui.components.data.options;
 
 import com.haulmont.bali.events.EventHub;
 import com.haulmont.bali.events.Subscription;
+import com.haulmont.bali.events.sys.VoidSubscription;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.meta.EntityOptions;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -58,14 +60,10 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
 
     @Override
     public void updateItem(E item) {
-        Map<String, E> itemsCollection = getItemsCollection();
-        if (itemsCollection.containsValue(item)) {
-            itemsCollection.entrySet()
-                    .stream()
-                    .filter(entry -> Objects.equals(entry.getValue(), item))
-                    .findFirst()
-                    .get()
-                    .setValue(item);
+        List<E> itemsCollection = getItemsValuesList();
+        int index = itemsCollection.indexOf(item);
+        if (index > -1) {
+            itemsCollection.set(index, item);
         }
     }
 
@@ -74,10 +72,9 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
         // do nothing
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Subscription addValueChangeListener(Consumer<ValueChangeEvent<E>> listener) {
-        return events.subscribe(ValueChangeEvent.class, (Consumer) listener);
+        return VoidSubscription.INSTANCE;
     }
 
     @Override
@@ -86,16 +83,15 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
         if (selectedItem != null) {
             metaClass = selectedItem.getMetaClass();
         } else {
-            Map<String, E> itemsCollection = getItemsCollection();
+            List<E> itemsCollection = getItemsValuesList();
             if (!itemsCollection.isEmpty()) {
-                metaClass = itemsCollection.entrySet()
-                        .stream()
-                        .findFirst()
-                        .get()
-                        .getValue()
-                        .getMetaClass();
+                metaClass = itemsCollection.get(0).getMetaClass();
             }
         }
         return metaClass;
+    }
+
+    protected List<E> getItemsValuesList() {
+        return new ArrayList<>(getItemsCollection().values());
     }
 }

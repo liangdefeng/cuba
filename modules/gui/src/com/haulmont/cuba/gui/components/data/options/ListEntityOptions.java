@@ -18,12 +18,12 @@ package com.haulmont.cuba.gui.components.data.options;
 
 import com.haulmont.bali.events.EventHub;
 import com.haulmont.bali.events.Subscription;
+import com.haulmont.bali.events.sys.VoidSubscription;
 import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.meta.EntityOptions;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -38,8 +38,13 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
 
     protected E selectedItem = null;
 
-    public ListEntityOptions(Collection<E> options) {
+    public ListEntityOptions(List<E> options) {
         super(options);
+    }
+
+    @Override
+    public List<E> getItemsCollection() {
+        return (List<E>) super.getItemsCollection();
     }
 
     @Override
@@ -58,9 +63,9 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
 
     @Override
     public void updateItem(E item) {
-        List<E> itemsCollection = (List<E>) getItemsCollection();
-        if (itemsCollection.contains(item)) {
-            int index = itemsCollection.indexOf(item);
+        List<E> itemsCollection = getItemsCollection();
+        int index = itemsCollection.indexOf(item);
+        if (index > -1) {
             itemsCollection.set(index, item);
         }
     }
@@ -70,10 +75,9 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
         // do nothing
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public Subscription addValueChangeListener(Consumer<ValueChangeEvent<E>> listener) {
-        return events.subscribe(ValueChangeEvent.class, (Consumer) listener);
+        return VoidSubscription.INSTANCE;
     }
 
     @Override
@@ -82,7 +86,7 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
         if (selectedItem != null) {
             metaClass = selectedItem.getMetaClass();
         } else {
-            List<E> itemsCollection = (List<E>) getItemsCollection();
+            List<E> itemsCollection = getItemsCollection();
             if (!itemsCollection.isEmpty()) {
                 metaClass = itemsCollection.get(0).getMetaClass();
             }

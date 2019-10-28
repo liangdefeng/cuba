@@ -187,7 +187,7 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
     default List getOptionsList() {
         Options<V> options = getOptions();
         if (options instanceof ListEntityOptions) {
-            return (List) ((ListEntityOptions<V>) options).getItemsCollection();
+            return ((ListEntityOptions<V>) options).getItemsCollection();
         }
         return null;
     }
@@ -197,7 +197,7 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      */
     @SuppressWarnings("unchecked")
     default void setOptionsList(List optionsList) {
-        setOptions(new ListEntityOptions<V>(optionsList));
+        setOptions(new ListEntityOptions<>(optionsList));
     }
 
     /**
@@ -207,10 +207,10 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      */
     @SuppressWarnings("unchecked")
     @Deprecated
-    default Map<String, V> getOptionsMap() {
-        Options<V> options = getOptions();
+    default Map<String, ?> getOptionsMap() {
+        Options options = getOptions();
         if (options instanceof MapEntityOptions) {
-            return ((MapEntityOptions<V>) options).getItemsCollection();
+            return ((MapEntityOptions) options).getItemsCollection();
         }
         return null;
     }
@@ -219,8 +219,8 @@ public interface TokenList<V extends Entity> extends Field<Collection<V>>,
      * @param optionsMap options map
      */
     @SuppressWarnings("unchecked")
-    default void setOptionsMap(Map<String, V> optionsMap) {
-        setOptions(new MapEntityOptions<>(optionsMap));
+    default void setOptionsMap(Map<String, ?> optionsMap) {
+        setOptions(new MapEntityOptions(optionsMap));
     }
 
     /**
