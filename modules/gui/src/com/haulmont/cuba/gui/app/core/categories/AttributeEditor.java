@@ -141,8 +141,6 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
     protected Table<ScreenAndComponent> targetScreensTable;
     @Inject
     protected TabSheet tabsheet;
-    @Named("attributeFieldGroup.code")
-    protected TextField<String> code;
     @Named("attributeFieldGroup.dataType")
     protected LookupField<PropertyType> dataType;
     @Named("optionalAttributeFieldGroup.entityClass")
@@ -327,7 +325,7 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
                 changeAttributesUI();
                 changeAttributeValues();
             }
-            if (e.getPrevValue() == null && "dataType".equals(property)) {
+            if (e.getPrevValue()==null && "dataType".equals(property)) {
                 getDialogOptions().center();
             }
             if ("name".equals(property)) {
@@ -354,14 +352,6 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
         defaultBoolean.setOptionsMap(getBooleanOptions());
         dataType.setOptionsMap(getTypeOptions());
         entityClassField.setOptionsMap(getEntityOptions());
-
-        code.addValueChangeListener(e -> {
-            String currentVal = e.getValue();
-            if (currentVal.contains(".")) {
-                getItem().setCode(currentVal.replace(".", "_"));
-                showNotification(getMessage("attributeFieldGroup.code.dotsValidation"), NotificationType.TRAY);
-            }
-        });
 
         defaultEntityId.addValueChangeListener(e -> {
             Entity entity = e.getValue();
@@ -588,7 +578,7 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
             if (attribute.getCategory() != null) {
                 categoryName = StringUtils.defaultString(attribute.getCategory().getName());
             }
-            attribute.setCode(StringUtils.deleteWhitespace(categoryName + attribute.getName()).replace(".", "_"));
+            attribute.setCode(StringUtils.deleteWhitespace(categoryName + attribute.getName()));
         }
     }
 
