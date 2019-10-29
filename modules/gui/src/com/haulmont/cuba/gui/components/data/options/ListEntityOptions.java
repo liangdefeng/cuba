@@ -22,6 +22,8 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.meta.EntityOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -32,6 +34,8 @@ import java.util.function.Consumer;
  * @param <E> entity type
  */
 public class ListEntityOptions<E extends Entity> extends ListOptions<E> implements Options<E>, EntityOptions<E> {
+
+    private static final Logger log = LoggerFactory.getLogger(ListEntityOptions.class);
 
     protected E selectedItem = null;
 
@@ -60,16 +64,14 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
 
     @Override
     public void updateItem(E item) {
-        List<E> itemsCollection = getItemsCollection();
-        int index = itemsCollection.indexOf(item);
-        if (index > -1) {
-            itemsCollection.set(index, item);
-        }
+        // do nothing
+        log.debug("The 'updateItem' method was called for the options that may not support updating items");
     }
 
     @Override
     public void refresh() {
         // do nothing
+        log.debug("The 'refresh' method was called for the options that does not support data binding");
     }
 
     @Override

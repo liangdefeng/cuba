@@ -22,6 +22,8 @@ import com.haulmont.chile.core.model.MetaClass;
 import com.haulmont.cuba.core.entity.Entity;
 import com.haulmont.cuba.gui.components.data.Options;
 import com.haulmont.cuba.gui.components.data.meta.EntityOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +36,8 @@ import java.util.function.Consumer;
  * @param <E> entity type
  */
 public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements Options<E>, EntityOptions<E> {
+
+    private static final Logger log = LoggerFactory.getLogger(MapEntityOptions.class);
 
     protected E selectedItem = null;
 
@@ -57,16 +61,14 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
 
     @Override
     public void updateItem(E item) {
-        List<E> itemsCollection = getItemsValuesList();
-        int index = itemsCollection.indexOf(item);
-        if (index > -1) {
-            itemsCollection.set(index, item);
-        }
+        // do nothing
+        log.debug("The 'updateItem' method was called for the options that may not support updating items");
     }
 
     @Override
     public void refresh() {
         // do nothing
+        log.debug("The 'refresh' method was called for the options that does not support data binding");
     }
 
     @Override
@@ -80,15 +82,11 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
         if (selectedItem != null) {
             metaClass = selectedItem.getMetaClass();
         } else {
-            List<E> itemsCollection = getItemsValuesList();
+            List<E> itemsCollection = new ArrayList<>(getItemsCollection().values());
             if (!itemsCollection.isEmpty()) {
                 metaClass = itemsCollection.get(0).getMetaClass();
             }
         }
         return metaClass;
-    }
-
-    protected List<E> getItemsValuesList() {
-        return new ArrayList<>(getItemsCollection().values());
     }
 }
