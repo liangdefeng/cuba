@@ -62,7 +62,7 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
     @Override
     public void updateItem(E item) {
         // do nothing
-        log.debug("The 'updateItem' method is ignored, because underlying collection may be read-only");
+        log.debug("The 'updateItem' method is ignored, because underlying collection may be unmodifiable");
     }
 
     @Override

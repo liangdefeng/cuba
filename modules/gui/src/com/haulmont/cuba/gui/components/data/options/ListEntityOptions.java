@@ -65,7 +65,7 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
     @Override
     public void updateItem(E item) {
         // do nothing
-        log.debug("The 'updateItem' method is ignored, because underlying collection may be read-only");
+        log.debug("The 'updateItem' method is ignored, because underlying collection may be unmodifiable");
     }
 
     @Override
