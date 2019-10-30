@@ -68,7 +68,7 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
     @Override
     public void refresh() {
         // do nothing
-        log.debug("The 'refresh' method is ignored, because underlying collection does not support data binding");
+        log.debug("The 'refresh' method is ignored because the underlying collection contains static data");
     }
 
     @Override

@@ -71,7 +71,7 @@ public class ListEntityOptions<E extends Entity> extends ListOptions<E> implemen
     @Override
     public void refresh() {
         // do nothing
-        log.debug("The 'refresh' method is ignored, because underlying collection does not support data binding");
+        log.debug("The 'refresh' method is ignored because the underlying collection contains static data");
     }
 
     @Override
