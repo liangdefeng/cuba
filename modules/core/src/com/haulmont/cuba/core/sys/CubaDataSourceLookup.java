@@ -71,15 +71,17 @@ public class CubaDataSourceLookup {
         throw new RuntimeException(String.format("DataSource provider '%s' is unsupported! Available: 'jndi', 'application'", dataSourceProvider));
     }
 
-    public void closeApplicationDataSource(String storeName, DataSource dataSource) {
+    public boolean closeApplicationDataSource(String storeName, DataSource dataSource) {
         String dataSourceProvider = getDataSourceProvider(storeName);
         try {
             if (APPLICATION.equals(dataSourceProvider) && dataSource != null &&
                     ProxyDataSource.class.isAssignableFrom(dataSource.getClass()) && dataSource.isWrapperFor(HikariDataSource.class)) {
                 dataSource.unwrap(HikariDataSource.class).close();
             }
+            return true;
         } catch (SQLException | ClassCastException e) {
             log.error("Can't close sanity application data source.", e);
+            return false;
         }
     }
 
