@@ -62,13 +62,13 @@ public class MapEntityOptions<E extends Entity> extends MapOptions<E> implements
     @Override
     public void updateItem(E item) {
         // do nothing
-        log.debug("The 'updateItem' method was called for the options that may not support updating items");
+        log.debug("The 'updateItem' method is ignored, because underlying collection may be read-only");
     }
 
     @Override
     public void refresh() {
         // do nothing
-        log.debug("The 'refresh' method was called for the options that does not support data binding");
+        log.debug("The 'refresh' method is ignored, because underlying collection does not support data binding");
     }
 
     @Override
