@@ -496,7 +496,6 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
                     MessageType.CONFIRMATION_HTML.modal(false).width(560f)));
             whereClause.setContextHelpIconClickHandler(e -> showMessageDialog(getMessage("whereClause"), getMessage("whereClauseHelp"),
                     MessageType.CONFIRMATION_HTML.modal(false).width(560f)));
-            optionsLoaderScript.setMode(SourceCodeEditor.Mode.Text);
         } else {
             optionsLoaderScript.setContextHelpIconClickHandler(null);
             optionsLoaderScript.setMode(SourceCodeEditor.Mode.Text);
