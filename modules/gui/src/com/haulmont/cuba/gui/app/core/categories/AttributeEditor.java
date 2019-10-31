@@ -477,6 +477,10 @@ public class AttributeEditor extends AbstractEditor<CategoryAttribute> {
             optionsType = null;
             optionsLoaderType.setValue(null);
         }
+        if (optionsType == SQL && attribute.getIsEntity()) {
+            optionsType = JPQL;
+            optionsLoaderType.setValue(JPQL);
+        }
 
         boolean jpqlLoaderVisible = optionsType == JPQL;
         joinClause.setVisible(jpqlLoaderVisible);
