@@ -39,7 +39,7 @@ class TokenListTest extends UiScreenSpec {
         constraint2 = metadata.create(Constraint.class)
     }
 
-    def "List options is propagated to TokenList optionsContainer using setOptionsList"() {
+    def "List options are set to TokenList optionsContainer using setOptionsList"() {
         def screens = vaadinUi.screens
 
         def mainWindow = screens.create("mainWindow", OpenMode.ROOT)
@@ -51,14 +51,20 @@ class TokenListTest extends UiScreenSpec {
         def tokenList = tokenListScreen.tokenList as TokenList<Constraint>
         def list = Lists.newArrayList(constraint1, constraint2)
 
-        when: 'List options is set to TokenList'
+        when: 'List options are set to TokenList using setOptionsList'
         tokenList.setOptionsList(list)
 
-        then: 'List options is propagated to TokenList'
-        tokenList.getOptionsList() == list
+        then: 'No exception should be thrown'
+        noExceptionThrown()
+
+        and: 'Options class should be ListEntityOptions'
+        tokenList.getOptions().getClass() == ListEntityOptions
+
+        and: 'Items of options should be equal to List specified by the setOptionsList'
+        ((ListEntityOptions) tokenList.getOptions()).getItemsCollection() == list
     }
 
-    def "Map options is propagated to TokenList optionsContainer using setOptionsMap"() {
+    def "Map options are set to TokenList optionsContainer using setOptionsMap"() {
         def screens = vaadinUi.screens
 
         def mainWindow = screens.create("mainWindow", OpenMode.ROOT)
@@ -73,59 +79,20 @@ class TokenListTest extends UiScreenSpec {
         map.put(constraint1.getId(), constraint1)
         map.put(constraint2.getId(), constraint2)
 
-        when: 'Map options is set to TokenList'
+        when: 'Map options are set to TokenList using setOptionsMap'
         tokenList.setOptionsMap(map)
 
-        then: 'Map options is propagated to TokenList'
-        tokenList.getOptionsMap() == map
-    }
+        then: 'No exception should be thrown'
+        noExceptionThrown()
 
-    def "ListEntityOptions is propagated to TokenList optionsContainer using setOptions"() {
-        def screens = vaadinUi.screens
-
-        def mainWindow = screens.create("mainWindow", OpenMode.ROOT)
-        screens.show(mainWindow)
-
-        def tokenListScreen = screens.create(TokenListScreen)
-        tokenListScreen.show()
-
-        def tokenList = tokenListScreen.tokenList as TokenList<Constraint>
-        def list = Lists.newArrayList(constraint1, constraint2)
-        def options = new ListEntityOptions(list)
-
-        when: 'ListEntityOptions is set to TokenList'
-        tokenList.setOptions(options)
-
-        then: 'ListEntityOptions is propagated to TokenList'
-        tokenList.getOptions() == options
-        tokenList.getOptions().getClass() == ListEntityOptions
-    }
-
-    def "MapEntityOptions is propagated to TokenList optionsContainer using setOptions"() {
-        def screens = vaadinUi.screens
-
-        def mainWindow = screens.create("mainWindow", OpenMode.ROOT)
-        screens.show(mainWindow)
-
-        def tokenListScreen = screens.create(TokenListScreen)
-        tokenListScreen.show()
-
-        def tokenList = tokenListScreen.tokenList as TokenList<Constraint>
-
-        def map = new HashMap<String, Constraint>()
-        map.put(constraint1.getId(), constraint1)
-        map.put(constraint2.getId(), constraint2)
-        def options = new MapEntityOptions(map)
-
-        when: 'MapEntityOptions is set to TokenList'
-        tokenList.setOptions(options)
-
-        then: 'MapEntityOptions is propagated to TokenList'
-        tokenList.getOptions() == options
+        and: 'Options class should be MapEntityOptions'
         tokenList.getOptions().getClass() == MapEntityOptions
+
+        and: 'Items of options should be equal to Map specified by the setOptionsMap'
+        ((MapEntityOptions) tokenList.getOptions()).getItemsCollection() == map
     }
 
-    def "ContainerOptions is propagated to TokenList optionsContainer using setOptions"() {
+    def "ContainerOptions are set to TokenList optionsContainer using setOptions"() {
         def screens = vaadinUi.screens
 
         def mainWindow = screens.create("mainWindow", OpenMode.ROOT)
@@ -140,11 +107,19 @@ class TokenListTest extends UiScreenSpec {
         container.setItems(Lists.newArrayList(constraint1, constraint2))
         def options = new ContainerOptions(container)
 
-        when: 'ContainerOptions is set to TokenList'
+        when: 'ContainerOptions are set to TokenList using setOptions'
         tokenList.setOptions(options)
 
-        then: 'ContainerOptions is propagated to TokenList'
-        tokenList.getOptions() == options
+        then: 'No exception should be thrown'
+        noExceptionThrown()
+
+        and: 'Options class should be ContainerOptions'
         tokenList.getOptions().getClass() == ContainerOptions
+
+        then: 'Options should be equal to initial options'
+        tokenList.getOptions() == options
+
+        and: 'Container of options should be equal to CollectionContainer'
+        ((ContainerOptions) tokenList.getOptions()).getContainer() == container
     }
 }
