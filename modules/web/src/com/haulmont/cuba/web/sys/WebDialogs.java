@@ -649,6 +649,7 @@ public class WebDialogs implements Dialogs {
         protected String message;
         protected String caption;
         protected Throwable throwable;
+        protected ContentMode contentMode;
 
         @Override
         public ExceptionDialogBuilder withThrowable(Throwable throwable) {
@@ -681,6 +682,18 @@ public class WebDialogs implements Dialogs {
         @Override
         public String getMessage() {
             return message;
+        }
+
+        @Override
+        public ExceptionDialogBuilder withContentMode(ContentMode contentMode) {
+            // just stub
+            this.contentMode = contentMode;
+            return this;
+        }
+
+        @Override
+        public ContentMode getContentMode() {
+            return contentMode;
         }
 
         @Override
@@ -802,6 +815,11 @@ public class WebDialogs implements Dialogs {
         }
 
         @Override
+        public SizeUnit getWidthSizeUnit() {
+            return inputDialog.getDialogWindow().getWidthSizeUnit();
+        }
+
+        @Override
         public InputDialogBuilder withHeight(String height) {
             inputDialog.getDialogWindow().setDialogHeight(height);
             return this;
@@ -809,6 +827,11 @@ public class WebDialogs implements Dialogs {
 
         public float getHeight() {
             return inputDialog.getDialogWindow().getDialogHeight();
+        }
+
+        @Override
+        public SizeUnit getHeightSizeUnit() {
+            return inputDialog.getDialogWindow().getHeightSizeUnit();
         }
 
         @Nullable
