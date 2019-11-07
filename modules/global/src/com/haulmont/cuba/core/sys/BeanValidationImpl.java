@@ -28,6 +28,7 @@ import org.hibernate.validator.internal.constraintvalidators.bv.time.future.*;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.futureorpresent.*;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.past.*;
 import org.hibernate.validator.internal.constraintvalidators.bv.time.pastorpresent.*;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Nullable;
@@ -133,7 +134,10 @@ public class BeanValidationImpl implements BeanValidation {
 
     protected Locale getCurrentLocale() {
         Locale locale;
-        if (userSessionSource.checkCurrentUserSession()) {
+
+        if (LocaleContextHolder.getLocaleContext() != null && LocaleContextHolder.getLocaleContext().getLocale() != null) {
+            locale = LocaleContextHolder.getLocaleContext().getLocale();
+        } else if (userSessionSource.checkCurrentUserSession()) {
             locale = userSessionSource.getLocale();
         } else {
             locale = messages.getTools().getDefaultLocale();
