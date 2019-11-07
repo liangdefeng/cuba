@@ -18,7 +18,8 @@ package com.haulmont.cuba.web.gui.facets;
 
 import com.haulmont.cuba.core.global.MessageTools;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
-import com.haulmont.cuba.gui.Notifications;
+import com.haulmont.cuba.gui.Notifications.NotificationType;
+import com.haulmont.cuba.gui.Notifications.Position;
 import com.haulmont.cuba.gui.components.ContentMode;
 import com.haulmont.cuba.gui.components.NotificationFacet;
 import com.haulmont.cuba.gui.xml.FacetProvider;
@@ -80,7 +81,7 @@ public class NotificationFacetProvider implements FacetProvider<NotificationFace
                                ComponentLoader.ComponentContext context) {
         String caption = element.attributeValue("caption");
         if (isNotEmpty(caption)) {
-            facet.setCaption(loadResourceString(context.getFrame().getClass(), caption));
+            facet.setCaption(loadResourceString(context, caption));
         }
     }
 
@@ -88,14 +89,14 @@ public class NotificationFacetProvider implements FacetProvider<NotificationFace
                                    ComponentLoader.ComponentContext context) {
         String description = element.attributeValue("description");
         if (isNotEmpty(description)) {
-            facet.setDescription(loadResourceString(context.getFrame().getClass(), description));
+            facet.setDescription(loadResourceString(context, description));
         }
     }
 
     protected void loadType(NotificationFacet facet, Element element) {
         String type = element.attributeValue("type");
         if (isNotEmpty(type)) {
-            facet.setType(Notifications.NotificationType.valueOf(type));
+            facet.setType(NotificationType.valueOf(type));
         }
     }
 
@@ -123,7 +124,7 @@ public class NotificationFacetProvider implements FacetProvider<NotificationFace
     protected void loadPosition(NotificationFacet facet, Element element) {
         String position = element.attributeValue("position");
         if (isNotEmpty(position)) {
-            facet.setPosition(Notifications.Position.valueOf(position));
+            facet.setPosition(Position.valueOf(position));
         }
     }
 
@@ -132,9 +133,10 @@ public class NotificationFacetProvider implements FacetProvider<NotificationFace
         String actionTarget = element.attributeValue("onAction");
         String buttonTarget = element.attributeValue("onButton");
 
-        if (isNotEmpty(actionTarget) && isNotEmpty(buttonTarget)) {
+        if (isNotEmpty(actionTarget)
+                && isNotEmpty(buttonTarget)) {
             throw new GuiDevelopmentException(
-                    "Notification facet should have either action or button target", context);
+                    "Notification Facet should have either action or button subscription", context);
         }
 
         if (isNotEmpty(actionTarget)) {
@@ -144,10 +146,15 @@ public class NotificationFacetProvider implements FacetProvider<NotificationFace
         }
     }
 
-    protected String loadResourceString(Class frameClass, String caption) {
+    protected String loadResourceString(ComponentLoader.ComponentContext context, String caption) {
         if (isEmpty(caption)) {
             return caption;
         }
-        return messageTools.loadString(frameClass.getPackage().getName(), caption);
+
+        Class screenClass = context.getFrame()
+                .getFrameOwner()
+                .getClass();
+
+        return messageTools.loadString(screenClass.getPackage().getName(), caption);
     }
 }

@@ -8,25 +8,49 @@ import java.util.function.Consumer;
  *
  * @see OptionDialogFacet
  * @see InputDialogFacet
+ *
+ * @param <T> dialog facet type
  */
-public interface ActionsAwareDialogFacet {
+public interface ActionsAwareDialogFacet<T> {
 
     /**
      * Sets dialog actions.
      *
      * @param actions actions
      */
-    void setActions(Collection<DialogAction> actions);
+    void setActions(Collection<DialogAction<T>> actions);
 
     /**
      * @return dialog actions
      */
-    Collection<DialogAction> getActions();
+    Collection<DialogAction<T>> getActions();
+
+    /**
+     * The event that is fired when {@link DialogAction#actionHandler} is triggered.
+     */
+    class DialogActionPerformedEvent<T> {
+
+        protected T dialog;
+        protected DialogAction dialogAction;
+
+        public DialogActionPerformedEvent(T dialog, DialogAction dialogAction) {
+            this.dialog = dialog;
+            this.dialogAction = dialogAction;
+        }
+
+        public T getDialog() {
+            return dialog;
+        }
+
+        public DialogAction getDialogAction() {
+            return dialogAction;
+        }
+    }
 
     /**
      * Immutable POJO that stores dialog action settings.
      */
-    class DialogAction {
+    class DialogAction<T> {
 
         protected final String id;
         protected final String caption;
@@ -34,7 +58,7 @@ public interface ActionsAwareDialogFacet {
         protected final String icon;
         protected final boolean primary;
 
-        protected Consumer<DialogActionPerformedEvent> actionHandler;
+        protected Consumer<DialogActionPerformedEvent<T>> actionHandler;
 
         public DialogAction(String id, String caption, String description, String icon, boolean primary) {
             this.id = id;
@@ -64,7 +88,7 @@ public interface ActionsAwareDialogFacet {
             return primary;
         }
 
-        public Consumer<DialogActionPerformedEvent> getActionHandler() {
+        public Consumer<DialogActionPerformedEvent<T>> getActionHandler() {
             return actionHandler;
         }
 
@@ -75,30 +99,8 @@ public interface ActionsAwareDialogFacet {
          *
          * @param actionHandler action handler
          */
-        public void setActionHandler(Consumer<DialogActionPerformedEvent> actionHandler) {
+        public void setActionHandler(Consumer<DialogActionPerformedEvent<T>> actionHandler) {
             this.actionHandler = actionHandler;
-        }
-    }
-
-    /**
-     * The event that is fired when {@link DialogAction#actionHandler} is triggered.
-     */
-    class DialogActionPerformedEvent {
-
-        protected ActionsAwareDialogFacet dialog;
-        protected DialogAction dialogAction;
-
-        public DialogActionPerformedEvent(ActionsAwareDialogFacet dialog, DialogAction dialogAction) {
-            this.dialog = dialog;
-            this.dialogAction = dialogAction;
-        }
-
-        public ActionsAwareDialogFacet getDialog() {
-            return dialog;
-        }
-
-        public DialogAction getDialogAction() {
-            return dialogAction;
         }
     }
 }

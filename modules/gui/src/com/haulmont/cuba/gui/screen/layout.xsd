@@ -3441,8 +3441,8 @@
     <xs:complexType name="notificationType">
         <xs:attribute name="id" type="xs:string" use="required"/>
 
-        <xs:attribute name="caption" type="xs:string"/>
-        <xs:attribute name="description" type="xs:string"/>
+        <xs:attribute name="caption" type="resourceString"/>
+        <xs:attribute name="description" type="resourceString"/>
         <xs:attribute name="type" type="notificationTypeEnum"/>
         <xs:attribute name="delay" type="xs:int"/>
 
@@ -3467,8 +3467,8 @@
 
     <xs:complexType name="dialogType">
         <xs:attribute name="id" type="xs:string" use="required"/>
-        <xs:attribute name="caption" type="xs:string"/>
-        <xs:attribute name="message" type="xs:string"/>
+        <xs:attribute name="caption" type="resourceString"/>
+        <xs:attribute name="message" type="resourceString"/>
         <xs:attribute name="type" type="dialogMessageType"/>
 
         <xs:attribute name="contentMode" type="contentMode"/>
@@ -3591,8 +3591,8 @@
 
     <xs:complexType name="dialogActionType">
         <xs:attribute name="id" type="xs:string" use="required"/>
-        <xs:attribute name="caption" type="xs:string"/>
-        <xs:attribute name="description" type="xs:string"/>
+        <xs:attribute name="caption" type="resourceString"/>
+        <xs:attribute name="description" type="resourceString"/>
         <xs:attribute name="icon" type="xs:string"/>
         <xs:attribute name="primary" type="xs:boolean"/>
     </xs:complexType>

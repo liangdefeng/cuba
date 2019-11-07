@@ -26,8 +26,7 @@ import com.haulmont.cuba.core.global.Metadata;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.app.core.inputdialog.DialogActions;
 import com.haulmont.cuba.gui.app.core.inputdialog.InputParameter;
-import com.haulmont.cuba.gui.components.ActionsAwareDialogFacet;
-import com.haulmont.cuba.gui.components.Frame;
+import com.haulmont.cuba.gui.components.ActionsAwareDialogFacet.DialogAction;
 import com.haulmont.cuba.gui.components.InputDialogFacet;
 import com.haulmont.cuba.gui.icons.Icons;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
@@ -108,10 +107,11 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         }
     }
 
-    protected void loadCaption(InputDialogFacet facet, Element element, ComponentLoader.ComponentContext context) {
+    protected void loadCaption(InputDialogFacet facet, Element element,
+                               ComponentLoader.ComponentContext context) {
         String caption = element.attributeValue("caption");
         if (isNotEmpty(caption)) {
-            facet.setCaption(loadResourceString(context.getFrame().getClass(), caption));
+            facet.setCaption(loadResourceString(context, caption));
         }
     }
 
@@ -134,9 +134,10 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         String actionTarget = element.attributeValue("onAction");
         String buttonTarget = element.attributeValue("onButton");
 
-        if (isNotEmpty(actionTarget) && isNotEmpty(buttonTarget)) {
+        if (isNotEmpty(actionTarget)
+                && isNotEmpty(buttonTarget)) {
             throw new GuiDevelopmentException(
-                    "Dialog facet should have either action or button target",
+                    "InputDialog facet should have either action or button target",
                     context);
         }
 
@@ -163,7 +164,7 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         }
     }
 
-    protected void loadActions(ActionsAwareDialogFacet facet, Element element,
+    protected void loadActions(InputDialogFacet facet, Element element,
                                ComponentLoader.ComponentContext context) {
         Element actionsEl = element.element("actions");
         if (actionsEl == null) {
@@ -172,7 +173,7 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
 
         List<Element> actionElements = actionsEl.elements("action");
 
-        List<ActionsAwareDialogFacet.DialogAction> actions = new ArrayList<>(actionElements.size());
+        List<DialogAction<InputDialogFacet>> actions = new ArrayList<>(actionElements.size());
         for (Element actionElement : actionElements) {
             actions.add(loadAction(actionElement, context));
         }
@@ -180,17 +181,15 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         facet.setActions(actions);
     }
 
-    protected ActionsAwareDialogFacet.DialogAction loadAction(Element element,
-                                                              ComponentLoader.ComponentContext context) {
-        Class<? extends Frame> frameClass = context.getFrame().getClass();
-
+    protected DialogAction<InputDialogFacet> loadAction(Element element,
+                                                                         ComponentLoader.ComponentContext context) {
         String id = element.attributeValue("id");
-        String caption = loadResourceString(frameClass, element.attributeValue("caption"));
-        String description = loadResourceString(frameClass, element.attributeValue("description"));
-        String icon = getIconPath(frameClass, element.attributeValue("icon"));
+        String caption = loadResourceString(context, element.attributeValue("caption"));
+        String description = loadResourceString(context, element.attributeValue("description"));
+        String icon = getIconPath(context, element.attributeValue("icon"));
         boolean primary = Boolean.parseBoolean(element.attributeValue("primary"));
 
-        return new ActionsAwareDialogFacet.DialogAction(id, caption, description, icon, primary);
+        return new DialogAction<>(id, caption, description, icon, primary);
     }
 
     protected void loadDefaultActions(InputDialogFacet facet, Element element) {
@@ -221,10 +220,15 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
             }
         }
 
+        if (inputParameters.isEmpty()) {
+            throw new GuiDevelopmentException("InputDialog Facet cannot be used without parameters", context);
+        }
+
         facet.setParameters(inputParameters.toArray(new InputParameter[]{}));
     }
 
-    protected InputParameter loadInputParameter(Element paramEl, ComponentLoader.ComponentContext context) {
+    protected InputParameter loadInputParameter(Element paramEl,
+                                                ComponentLoader.ComponentContext context) {
         String paramName = paramEl.getName();
         if ("entityParameter".equals(paramName)) {
             return loadEntityParameter(paramEl, context);
@@ -240,7 +244,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         }
     }
 
-    protected InputParameter loadPrimitiveParameter(Element paramEl, ComponentLoader.ComponentContext context) {
+    protected InputParameter loadPrimitiveParameter(Element paramEl,
+                                                    ComponentLoader.ComponentContext context) {
         String paramId = paramEl.attributeValue("id");
         String paramName = paramEl.getName();
 
@@ -268,7 +273,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
     }
 
     @SuppressWarnings("unchecked")
-    protected InputParameter loadEntityParameter(Element paramEl, ComponentLoader.ComponentContext context) {
+    protected InputParameter loadEntityParameter(Element paramEl,
+                                                 ComponentLoader.ComponentContext context) {
         String paramId = paramEl.attributeValue("id");
         String classFqn = paramEl.attributeValue("entityClass");
 
@@ -293,7 +299,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
     }
 
     @SuppressWarnings("unchecked")
-    protected InputParameter loadEnumParameter(Element paramEl, ComponentLoader.ComponentContext context) {
+    protected InputParameter loadEnumParameter(Element paramEl,
+                                               ComponentLoader.ComponentContext context) {
         String paramId = paramEl.attributeValue("id");
         String classFqn = paramEl.attributeValue("enumClass");
 
@@ -316,7 +323,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         return parameter;
     }
 
-    protected Datatype loadDatatype(Element element, ComponentLoader.ComponentContext context) {
+    protected Datatype loadDatatype(Element element,
+                                    ComponentLoader.ComponentContext context) {
         String paramName = element.getName();
 
         Matcher matcher = PARAM_TYPE_REGEX.matcher(paramName);
@@ -331,10 +339,11 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
     }
 
     @Nullable
-    protected String loadParamCaption(Element paramEl, ComponentLoader.ComponentContext context) {
+    protected String loadParamCaption(Element paramEl,
+                                      ComponentLoader.ComponentContext context) {
         String caption = paramEl.attributeValue("caption");
         if (isNotEmpty(caption)) {
-            return loadResourceString(context.getFrame().getClass(), caption);
+            return loadResourceString(context, caption);
         }
         return null;
     }
@@ -348,7 +357,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
     }
 
     @Nullable
-    protected Object loadDefaultValue(Element paramEl, Datatype datatype, ComponentLoader.ComponentContext context) {
+    protected Object loadDefaultValue(Element paramEl, Datatype datatype,
+                                      ComponentLoader.ComponentContext context) {
         String defaultValue = paramEl.attributeValue("defaultValue");
         if (isNotEmpty(defaultValue)) {
             try {
@@ -363,7 +373,8 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         return null;
     }
 
-    protected Class loadParamClass(Element paramEl, String classFqn, ComponentLoader.ComponentContext context) {
+    protected Class loadParamClass(Element paramEl, String classFqn,
+                                   ComponentLoader.ComponentContext context) {
         try {
             return ReflectionHelper.loadClass(classFqn);
         } catch (ClassNotFoundException e) {
@@ -375,14 +386,19 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
         }
     }
 
-    protected String loadResourceString(Class frameClass, String caption) {
+    protected String loadResourceString(ComponentLoader.ComponentContext context, String caption) {
         if (isEmpty(caption)) {
             return caption;
         }
-        return messageTools.loadString(frameClass.getPackage().getName(), caption);
+
+        Class screenClass = context.getFrame()
+                .getFrameOwner()
+                .getClass();
+
+        return messageTools.loadString(screenClass.getPackage().getName(), caption);
     }
 
-    protected String getIconPath(Class<? extends Frame> frameClass, String icon) {
+    protected String getIconPath(ComponentLoader.ComponentContext context, String icon) {
         if (icon == null || icon.isEmpty()) {
             return null;
         }
@@ -395,7 +411,7 @@ public class InputDialogFacetProvider implements FacetProvider<InputDialogFacet>
 
         if (isEmpty(iconPath)) {
             String themeValue = loadThemeString(icon);
-            iconPath = loadResourceString(frameClass, themeValue);
+            iconPath = loadResourceString(context, themeValue);
         }
 
         return iconPath;

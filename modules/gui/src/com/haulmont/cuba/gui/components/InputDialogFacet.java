@@ -16,11 +16,15 @@
 
 package com.haulmont.cuba.gui.components;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.cuba.gui.app.core.inputdialog.DialogActions;
 import com.haulmont.cuba.gui.app.core.inputdialog.InputDialog;
 import com.haulmont.cuba.gui.app.core.inputdialog.InputParameter;
 import com.haulmont.cuba.gui.meta.*;
+import com.haulmont.cuba.gui.screen.CloseAction;
 
+import java.util.EventObject;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -30,14 +34,15 @@ import java.util.function.Function;
 @StudioFacet(
         caption = "Input Dialog",
         description = "Prepares and shows input dialogs",
-        defaultProperty = "message"
+        defaultProperty = "message",
+        defaultEvent = "CloseEvent"
 )
 @StudioProperties(
         properties = {
                 @StudioProperty(name = "id", required = true)
         }
 )
-public interface InputDialogFacet extends Facet, ActionsAwareDialogFacet, HasSubParts {
+public interface InputDialogFacet extends Facet, ActionsAwareDialogFacet<InputDialogFacet>, HasSubParts {
 
     /**
      * Sets dialog caption.
@@ -127,12 +132,14 @@ public interface InputDialogFacet extends Facet, ActionsAwareDialogFacet, HasSub
     DialogActions getDialogActions();
 
     /**
-     * Sets input dialog close listener.
+     * Adds the given {@code Consumer} as dialog {@link InputDialog.InputDialogCloseEvent} listener.
      *
      * @param closeListener close listener
+     *
+     * @return close event subscription
      */
-    @StudioDelegate
-    void setCloseListener(Consumer<InputDialog.InputDialogCloseEvent> closeListener);
+    @StudioEvent
+    Subscription addCloseListener(Consumer<CloseEvent> closeListener);
 
     /**
      * Sets input dialog result handler.
@@ -159,7 +166,42 @@ public interface InputDialogFacet extends Facet, ActionsAwareDialogFacet, HasSub
     void setParameters(InputParameter... parameters);
 
     /**
-     * Shows dialog.
+     * Creates InputDialog.
+     *
+     * @return input dialog instance
+     */
+    InputDialog create();
+
+    /**
+     * Shows InputDialog.
      */
     InputDialog show();
+
+    /**
+     * Event that is fired when InputDialog is closed.
+     */
+    class CloseEvent extends EventObject {
+
+        protected CloseAction closeAction;
+        protected Map<String, Object> values;
+
+        public CloseEvent(InputDialogFacet source, CloseAction closeAction, Map<String, Object> values) {
+            super(source);
+            this.closeAction = closeAction;
+            this.values = values;
+        }
+
+        @Override
+        public InputDialogFacet getSource() {
+            return (InputDialogFacet) super.getSource();
+        }
+
+        public CloseAction getCloseAction() {
+            return closeAction;
+        }
+
+        public Map<String, Object> getValues() {
+            return values;
+        }
+    }
 }

@@ -16,6 +16,7 @@
 
 package com.haulmont.cuba.web.gui.components;
 
+import com.haulmont.bali.events.Subscription;
 import com.haulmont.cuba.gui.Dialogs;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.app.core.inputdialog.DialogActions;
@@ -49,13 +50,14 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
     protected String actionId;
     protected String buttonId;
 
-    protected DialogActions dialogActions;
+    protected DialogActions dialogActions = DialogActions.OK_CANCEL;
     protected Consumer<InputDialog.InputDialogResult> dialogResultHandler;
 
-    protected Collection<DialogAction> actions;
+    protected Collection<DialogAction<InputDialogFacet>> actions;
 
-    protected Consumer<InputDialog.InputDialogCloseEvent> closeListener;
     protected Function<InputDialog.ValidationContext, ValidationErrors> validator;
+
+    protected InputDialog inputDialog;
 
     @Override
     public void setCaption(String caption) {
@@ -133,18 +135,18 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
     }
 
     @Override
-    public void setActions(Collection<DialogAction> actions) {
+    public void setActions(Collection<DialogAction<InputDialogFacet>> actions) {
         this.actions = actions;
     }
 
     @Override
-    public Collection<DialogAction> getActions() {
+    public Collection<DialogAction<InputDialogFacet>> getActions() {
         return actions;
     }
 
     @Override
-    public void setCloseListener(Consumer<InputDialog.InputDialogCloseEvent> closeListener) {
-        this.closeListener = closeListener;
+    public Subscription addCloseListener(Consumer<CloseEvent> closeListener) {
+        return getEventHub().subscribe(CloseEvent.class, closeListener);
     }
 
     @Override
@@ -170,8 +172,7 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
     }
 
     @Override
-    public InputDialog show() {
-        Frame owner = getOwner();
+    public InputDialog create() {Frame owner = getOwner();
         if (owner == null) {
             throw new IllegalStateException("MessageDialog is not attached to Frame");
         }
@@ -189,8 +190,8 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
 
         builder.withCaption(caption)
                 .withParameters(parameters)
-                .withCloseListener(closeListener)
-                .withValidator(validator);
+                .withValidator(validator)
+                .withCloseListener(this::fireCloseActionEvent);
 
         if (dialogActions != null) {
             builder.withActions(dialogActions, dialogResultHandler);
@@ -198,7 +199,16 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
             builder.withActions(createActions(actions));
         }
 
-        return builder.show();
+        inputDialog = builder.build();
+
+        return inputDialog;
+    }
+
+    @Override
+    public InputDialog show() {
+        create();
+
+        return inputDialog;
     }
 
     @Override
@@ -206,6 +216,13 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
         super.setOwner(owner);
 
         subscribe();
+    }
+
+    protected void fireCloseActionEvent(InputDialog.InputDialogCloseEvent event) {
+        CloseEvent closeEvent = new CloseEvent(this,
+                event.getCloseAction(), event.getValues());
+
+        publish(CloseEvent.class, closeEvent);
     }
 
     protected void subscribe() {
@@ -254,7 +271,7 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
                 show());
     }
 
-    protected InputDialogAction[] createActions(Collection<DialogAction> actions) {
+    protected InputDialogAction[] createActions(Collection<DialogAction<InputDialogFacet>> actions) {
         if (actions == null) {
             return new InputDialogAction[]{};
         }
@@ -264,7 +281,7 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
                 .toArray(new InputDialogAction[]{});
     }
 
-    protected InputDialogAction createAction(DialogAction action) {
+    protected InputDialogAction createAction(DialogAction<InputDialogFacet> action) {
         return new InputDialogAction(action.getId())
                 .withCaption(action.getCaption())
                 .withDescription(action.getDescription())
@@ -273,7 +290,7 @@ public class WebInputDialogFacet extends WebAbstractFacet implements InputDialog
                 .withHandler(inputDialogActionPerformed -> {
                     if (action.getActionHandler() != null) {
                         action.getActionHandler().accept(
-                                new DialogActionPerformedEvent(this, action));
+                                new DialogActionPerformedEvent<>(this, action));
                     }
                 });
     }

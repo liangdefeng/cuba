@@ -17,7 +17,7 @@
 package com.haulmont.cuba.web.gui.facets;
 
 import com.haulmont.cuba.core.global.MessageTools;
-import com.haulmont.cuba.gui.Dialogs;
+import com.haulmont.cuba.gui.Dialogs.MessageType;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.components.ContentMode;
 import com.haulmont.cuba.gui.components.MessageDialogFacet;
@@ -84,21 +84,21 @@ public class MessageDialogFacetProvider implements FacetProvider<MessageDialogFa
     protected void loadCaption(MessageDialogFacet facet, Element element, ComponentLoader.ComponentContext context) {
         String caption = element.attributeValue("caption");
         if (isNotEmpty(caption)) {
-            facet.setCaption(loadResourceString(context.getFrame().getClass(), caption));
+            facet.setCaption(loadResourceString(context, caption));
         }
     }
 
     protected void loadMessage(MessageDialogFacet facet, Element element, ComponentLoader.ComponentContext context) {
         String message = element.attributeValue("message");
         if (isNotEmpty(message)) {
-            facet.setMessage(loadResourceString(context.getFrame().getClass(), message));
+            facet.setMessage(loadResourceString(context, message));
         }
     }
 
     protected void loadType(MessageDialogFacet facet, Element element) {
         String type = element.attributeValue("type");
         if (isNotEmpty(type)) {
-            facet.setType(Dialogs.MessageType.valueOf(type));
+            facet.setType(MessageType.valueOf(type));
         }
     }
 
@@ -171,10 +171,15 @@ public class MessageDialogFacetProvider implements FacetProvider<MessageDialogFa
         }
     }
 
-    protected String loadResourceString(Class frameClass, String caption) {
+    protected String loadResourceString(ComponentLoader.ComponentContext context, String caption) {
         if (isEmpty(caption)) {
             return caption;
         }
-        return messageTools.loadString(frameClass.getPackage().getName(), caption);
+
+        Class screenClass = context.getFrame()
+                .getFrameOwner()
+                .getClass();
+
+        return messageTools.loadString(screenClass.getPackage().getName(), caption);
     }
 }

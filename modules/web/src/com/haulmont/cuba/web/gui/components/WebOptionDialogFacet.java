@@ -48,15 +48,15 @@ public class WebOptionDialogFacet extends WebAbstractFacet
     protected String actionId;
     protected String buttonId;
 
-    protected Collection<DialogAction> actions;
+    protected Collection<DialogAction<OptionDialogFacet>> actions;
 
     @Override
-    public void setActions(Collection<DialogAction> actions) {
+    public void setActions(Collection<DialogAction<OptionDialogFacet>> actions) {
         this.actions = actions;
     }
 
     @Override
-    public Collection<DialogAction> getActions() {
+    public Collection<DialogAction<OptionDialogFacet>> getActions() {
         return actions;
     }
 
@@ -272,7 +272,7 @@ public class WebOptionDialogFacet extends WebAbstractFacet
                 .toArray(new Action[]{});
     }
 
-    protected BaseAction createAction(DialogAction action) {
+    protected BaseAction createAction(DialogAction<OptionDialogFacet> action) {
         return new BaseAction(action.getId())
                 .withCaption(action.getCaption())
                 .withDescription(action.getDescription())
@@ -281,7 +281,7 @@ public class WebOptionDialogFacet extends WebAbstractFacet
                 .withHandler(evt -> {
                     if (action.getActionHandler() != null) {
                         action.getActionHandler().accept(
-                                new DialogActionPerformedEvent(this, action));
+                                new DialogActionPerformedEvent<>(this, action));
                     }
                 });
     }

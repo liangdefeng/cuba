@@ -164,8 +164,9 @@ public interface Dialogs {
      */
     interface OptionDialogBuilder
             extends DialogBuilder<OptionDialogBuilder>,
-                    HasMessage<OptionDialogBuilder>,
                     HasType<OptionDialogBuilder>,
+                    HasMessage<OptionDialogBuilder>,
+                    HasContentMode<OptionDialogBuilder>,
                     HasMaximized<OptionDialogBuilder>,
                     HasStyleName<OptionDialogBuilder> {
         /**
@@ -190,8 +191,9 @@ public interface Dialogs {
      */
     interface MessageDialogBuilder
             extends DialogBuilder<MessageDialogBuilder>,
-                    HasMessage<MessageDialogBuilder>,
                     HasType<MessageDialogBuilder>,
+                    HasMessage<MessageDialogBuilder>,
+                    HasContentMode<MessageDialogBuilder>,
                     HasModal<MessageDialogBuilder>,
                     HasMaximized<MessageDialogBuilder>,
                     HasStyleName<MessageDialogBuilder> {
@@ -422,7 +424,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has caption setting.
+     * Marker interface for Dialog Builders that have caption.
      * @param <T> return type of fluent API methods
      */
     interface HasCaption<T> {
@@ -440,7 +442,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has message setting.
+     * Marker interface for Dialog Builders that have message.
      * @param <T> return type of fluent API methods
      */
     interface HasMessage<T> {
@@ -455,6 +457,13 @@ public interface Dialogs {
          * @return message text
          */
         String getMessage();
+    }
+
+    /**
+     * Marker interface for Dialog Builders that have content mode setting.
+     * @param <T> return type of fluent API methods
+     */
+    interface HasContentMode<T> {
 
         /**
          * Sets content mode for message, e.g. {@link ContentMode#TEXT}, {@link ContentMode#HTML}
@@ -471,7 +480,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has size setting.
+     * Marker interface for Dialog Builders that have size setting.
      * @param <T> return type of fluent API methods
      */
     interface HasSize<T> {
@@ -511,7 +520,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has stylename setting.
+     * Marker interface for Dialog Builders that have stylename setting.
      * @param <T> return type of fluent API methods
      */
     interface HasStyleName<T> {
@@ -529,7 +538,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has modal setting.
+     * Marker interface for Dialog Builders that have modal setting.
      * @param <T> return type of fluent API methods
      */
     interface HasModal<T> {
@@ -553,7 +562,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has maximized setting.
+     * Marker interface for Dialog Builders that have maximized setting.
      * @param <T> return type of fluent API methods
      */
     interface HasMaximized<T> {
@@ -577,7 +586,7 @@ public interface Dialogs {
     }
 
     /**
-     * Marker interface for Dialog Builders has type setting.
+     * Marker interface for Dialog Builders that have message type setting.
      * @param <T> return type of fluent API methods
      */
     interface HasType<T> {

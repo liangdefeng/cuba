@@ -21,7 +21,6 @@ import com.haulmont.cuba.gui.Dialogs;
 import com.haulmont.cuba.gui.GuiDevelopmentException;
 import com.haulmont.cuba.gui.components.ActionsAwareDialogFacet;
 import com.haulmont.cuba.gui.components.ContentMode;
-import com.haulmont.cuba.gui.components.Frame;
 import com.haulmont.cuba.gui.components.OptionDialogFacet;
 import com.haulmont.cuba.gui.icons.Icons;
 import com.haulmont.cuba.gui.theme.ThemeConstants;
@@ -99,7 +98,7 @@ public class OptionDialogFacetProvider
                                ComponentLoader.ComponentContext context) {
         String caption = element.attributeValue("caption");
         if (isNotEmpty(caption)) {
-            facet.setCaption(loadResourceString(context.getFrame().getClass(), caption));
+            facet.setCaption(loadResourceString(context, caption));
         }
     }
 
@@ -107,7 +106,7 @@ public class OptionDialogFacetProvider
                                ComponentLoader.ComponentContext context) {
         String message = element.attributeValue("message");
         if (isNotEmpty(message)) {
-            facet.setMessage(loadResourceString(context.getFrame().getClass(), message));
+            facet.setMessage(loadResourceString(context, message));
         }
     }
 
@@ -190,26 +189,28 @@ public class OptionDialogFacetProvider
 
     protected ActionsAwareDialogFacet.DialogAction loadAction(Element element,
                                                               ComponentLoader.ComponentContext context) {
-        Class<? extends Frame> frameClass = context.getFrame().getClass();
-
         String id = element.attributeValue("id");
-        String caption = loadResourceString(frameClass, element.attributeValue("caption"));
-        String description = loadResourceString(frameClass, element.attributeValue("description"));
-        String icon = getIconPath(frameClass, element.attributeValue("icon"));
+        String caption = loadResourceString(context, element.attributeValue("caption"));
+        String description = loadResourceString(context, element.attributeValue("description"));
+        String icon = getIconPath(context, element.attributeValue("icon"));
         boolean primary = Boolean.parseBoolean(element.attributeValue("primary"));
 
         return new ActionsAwareDialogFacet.DialogAction(id, caption, description, icon, primary);
     }
 
-    protected String loadResourceString(Class frameClass, String caption) {
+    protected String loadResourceString(ComponentLoader.ComponentContext context, String caption) {
         if (isEmpty(caption)) {
             return caption;
         }
 
-        return messageTools.loadString(frameClass.getPackage().getName(), caption);
+        Class screenClass = context.getFrame()
+                .getFrameOwner()
+                .getClass();
+
+        return messageTools.loadString(screenClass.getPackage().getName(), caption);
     }
 
-    protected String getIconPath(Class<? extends Frame> frameClass, String icon) {
+    protected String getIconPath(ComponentLoader.ComponentContext context, String icon) {
         if (icon == null || icon.isEmpty()) {
             return null;
         }
@@ -222,14 +223,15 @@ public class OptionDialogFacetProvider
 
         if (isEmpty(iconPath)) {
             String themeValue = loadThemeString(icon);
-            iconPath = loadResourceString(frameClass, themeValue);
+            iconPath = loadResourceString(context, themeValue);
         }
 
         return iconPath;
     }
 
     protected String loadThemeString(String value) {
-        if (value != null && value.startsWith(ThemeConstants.PREFIX)) {
+        if (value != null
+                && value.startsWith(ThemeConstants.PREFIX)) {
             value = themeConstantsManager.getConstants()
                     .get(value.substring(ThemeConstants.PREFIX.length()));
         }

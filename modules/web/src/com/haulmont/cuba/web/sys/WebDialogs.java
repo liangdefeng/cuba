@@ -649,7 +649,6 @@ public class WebDialogs implements Dialogs {
         protected String message;
         protected String caption;
         protected Throwable throwable;
-        protected ContentMode contentMode;
 
         @Override
         public ExceptionDialogBuilder withThrowable(Throwable throwable) {
@@ -682,18 +681,6 @@ public class WebDialogs implements Dialogs {
         @Override
         public String getMessage() {
             return message;
-        }
-
-        @Override
-        public ExceptionDialogBuilder withContentMode(ContentMode contentMode) {
-            // just stub
-            this.contentMode = contentMode;
-            return this;
-        }
-
-        @Override
-        public ContentMode getContentMode() {
-            return contentMode;
         }
 
         @Override

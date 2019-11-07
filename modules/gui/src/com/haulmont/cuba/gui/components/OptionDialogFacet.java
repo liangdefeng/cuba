@@ -35,7 +35,7 @@ import com.haulmont.cuba.gui.meta.StudioProperty;
                 @StudioProperty(name = "id", required = true)
         }
 )
-public interface OptionDialogFacet extends Facet, ActionsAwareDialogFacet, HasSubParts {
+public interface OptionDialogFacet extends Facet, ActionsAwareDialogFacet<OptionDialogFacet>, HasSubParts {
 
     /**
      * Sets dialog caption.

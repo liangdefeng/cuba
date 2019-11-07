@@ -443,7 +443,6 @@ public class UiControllerDependencyInjector implements ControllerDependencyInjec
                 Object subPart = ((HasSubParts) facet).getSubPart(id);
                 if (subPart != null) {
                     return subPart;
-
                 }
             }
         }
