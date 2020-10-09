@@ -2654,8 +2654,10 @@ public abstract class WebAbstractDataGrid<C extends Grid<E> & CubaEnhancedGrid<E
             }
         });
 
-        if (renderer != null) {
+        if (renderer == null) {
             generatedColumn.setRenderer(createRenderer(rendererType));
+        } else {
+            generatedColumn.setRenderer(renderer);
         }
 
         return column;
